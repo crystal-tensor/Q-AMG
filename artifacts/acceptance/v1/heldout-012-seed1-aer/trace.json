@@ -1,0 +1,1001 @@
+[
+  {
+    "round": 0,
+    "problem": {
+      "spec": {
+        "family": "drive",
+        "seed": 1001,
+        "groups": 3,
+        "scale": 0.9033968821939538,
+        "load": "light",
+        "compact": true,
+        "shaft_length_mm": 130.61469613506927,
+        "opening_mm": 36.43966154975748,
+        "max_gear_radius_mm": null,
+        "cost_overrides": {
+          "shaft": [
+            4,
+            20
+          ],
+          "bearing": [
+            4,
+            14
+          ],
+          "gear": [
+            3,
+            19
+          ]
+        },
+        "source_text": null
+      },
+      "groups": [
+        {
+          "key": "shaft",
+          "label": "轴径",
+          "options": [
+            {
+              "key": "slim",
+              "label": "Ø8 mm 轴",
+              "cost": 4,
+              "attributes": {
+                "radius": 4
+              }
+            },
+            {
+              "key": "stiff",
+              "label": "Ø12 mm 轴",
+              "cost": 23,
+              "attributes": {
+                "radius": 6
+              }
+            }
+          ]
+        },
+        {
+          "key": "bearing",
+          "label": "轴承规格",
+          "options": [
+            {
+              "key": "608",
+              "label": "小孔径轴承",
+              "cost": 4,
+              "attributes": {
+                "bore": 4.25
+              }
+            },
+            {
+              "key": "6001",
+              "label": "大孔径轴承",
+              "cost": 17,
+              "attributes": {
+                "bore": 6.25
+              }
+            }
+          ]
+        },
+        {
+          "key": "gear",
+          "label": "齿轮轮廓",
+          "options": [
+            {
+              "key": "compact",
+              "label": "紧凑齿轮",
+              "cost": 3,
+              "attributes": {
+                "radius": 14,
+                "teeth": 16
+              }
+            },
+            {
+              "key": "torque",
+              "label": "大直径齿轮",
+              "cost": 22,
+              "attributes": {
+                "radius": 18,
+                "teeth": 20
+              }
+            }
+          ]
+        }
+      ],
+      "pairs": [
+        {
+          "left": [
+            0,
+            0
+          ],
+          "right": [
+            1,
+            1
+          ],
+          "cost": 0,
+          "forbidden": true,
+          "reason": "bearing_fit_loose"
+        },
+        {
+          "left": [
+            0,
+            1
+          ],
+          "right": [
+            1,
+            0
+          ],
+          "cost": 0,
+          "forbidden": true,
+          "reason": "bearing_bore_too_small"
+        },
+        {
+          "left": [
+            0,
+            0
+          ],
+          "right": [
+            2,
+            1
+          ],
+          "cost": 7,
+          "forbidden": false,
+          "reason": "torque_on_slim_shaft"
+        }
+      ],
+      "unary": [],
+      "penalty": 81,
+      "qubo": {
+        "linear": [
+          -77.0,
+          -58.0,
+          -77.0,
+          -64.0,
+          -78.0,
+          -59.0
+        ],
+        "quadratic": [
+          {
+            "i": 0,
+            "j": 1,
+            "value": 162
+          },
+          {
+            "i": 2,
+            "j": 3,
+            "value": 162
+          },
+          {
+            "i": 4,
+            "j": 5,
+            "value": 162
+          },
+          {
+            "i": 0,
+            "j": 3,
+            "value": 81
+          },
+          {
+            "i": 1,
+            "j": 2,
+            "value": 81
+          },
+          {
+            "i": 0,
+            "j": 5,
+            "value": 7
+          }
+        ],
+        "offset": 243,
+        "groups": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            5
+          ]
+        ],
+        "ancillas": 0,
+        "bit_order": "qubit0_left"
+      }
+    },
+    "plan": {
+      "method": "qaoa_binary",
+      "execution_source": "ideal_simulator",
+      "candidates": [
+        {
+          "bits": "101010",
+          "energy": 11.0,
+          "feasible": true,
+          "count": 116,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        },
+        {
+          "bits": "101001",
+          "energy": 37.0,
+          "feasible": true,
+          "count": 1218,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        },
+        {
+          "bits": "010110",
+          "energy": 43.0,
+          "feasible": true,
+          "count": 60,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        },
+        {
+          "bits": "010101",
+          "energy": 62.0,
+          "feasible": true,
+          "count": 378,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        },
+        {
+          "bits": "100110",
+          "energy": 105.0,
+          "feasible": false,
+          "count": 28,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        },
+        {
+          "bits": "011010",
+          "energy": 111.0,
+          "feasible": false,
+          "count": 39,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        },
+        {
+          "bits": "011001",
+          "energy": 130.0,
+          "feasible": false,
+          "count": 107,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        },
+        {
+          "bits": "100101",
+          "energy": 131.0,
+          "feasible": false,
+          "count": 102,
+          "first_job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "first_seen_s": 0.003935041022486985
+        }
+      ],
+      "timings": {
+        "encoding_s": 2.6291003450751305e-05,
+        "circuit_build_s": 0.00016487500397488475,
+        "compilation_s": 0.0029743339982815087,
+        "backend_roundtrip_s": 0.00641283392906189,
+        "classical_scoring_s": 0.0011860840604640543,
+        "optimizer_controller_s": 0.0038219569833017886,
+        "wall_s": 0.014586374978534877,
+        "upload_s": 0.0,
+        "queue_s": 0.0,
+        "quantum_execution_s": null,
+        "readout_s": null,
+        "simulator_execution_s": 0.005410909652709961
+      },
+      "trace": [
+        {
+          "role": "training",
+          "job_id": "06effffd-e473-4824-b805-b169339ae37e",
+          "shots": 128,
+          "counts": {
+            "010101": 26,
+            "010110": 8,
+            "100110": 2,
+            "101010": 13,
+            "011001": 23,
+            "011010": 11,
+            "100101": 16,
+            "101001": 29
+          },
+          "raw_measurement_counts": {
+            "111": 26,
+            "110": 8,
+            "010": 2,
+            "000": 13,
+            "101": 23,
+            "100": 11,
+            "011": 16,
+            "001": 29
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.003935041022486985,
+          "mean_energy": 75.6953125,
+          "raw_feasible_rate": 0.59375,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.0006269169971346855,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0005290508270263672,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 386821106,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            0.6900759428559607,
+            0.21256037425626523,
+            0.2126137461291578,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "4274d6b3-14fa-4501-8f49-0bc5022d7e2e",
+          "shots": 128,
+          "counts": {
+            "010110": 4,
+            "010101": 15,
+            "011010": 1,
+            "100101": 17,
+            "101001": 69,
+            "100110": 2,
+            "101010": 8,
+            "011001": 12
+          },
+          "raw_measurement_counts": {
+            "110": 4,
+            "111": 15,
+            "100": 1,
+            "011": 17,
+            "001": 69,
+            "010": 2,
+            "000": 8,
+            "101": 12
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.004828415985684842,
+          "mean_energy": 61.3359375,
+          "raw_feasible_rate": 0.75,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.0005151249933987856,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0004401206970214844,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 163635320,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.21256037425626523,
+            0.2126137461291578,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "96becb73-e87f-47e3-8f21-55b20af809b1",
+          "shots": 128,
+          "counts": {
+            "011001": 1,
+            "101001": 95,
+            "100101": 2,
+            "101010": 1,
+            "010110": 4,
+            "010101": 25
+          },
+          "raw_measurement_counts": {
+            "101": 1,
+            "001": 95,
+            "011": 2,
+            "000": 1,
+            "110": 4,
+            "111": 25
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.0055433749803341925,
+          "mean_energy": 44.0625,
+          "raw_feasible_rate": 0.9765625,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.00047795800492167473,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.00041294097900390625,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 940044422,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.7125603742562652,
+            0.2126137461291578,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "08cdb9ba-4d6c-49df-9f1b-821e2791ceb6",
+          "shots": 128,
+          "counts": {
+            "100110": 3,
+            "101010": 12,
+            "100101": 9,
+            "101001": 55,
+            "011010": 7,
+            "011001": 7,
+            "010110": 9,
+            "010101": 26
+          },
+          "raw_measurement_counts": {
+            "010": 3,
+            "000": 12,
+            "011": 9,
+            "001": 55,
+            "100": 7,
+            "101": 7,
+            "110": 9,
+            "111": 26
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.006271457998082042,
+          "mean_energy": 57.3984375,
+          "raw_feasible_rate": 0.796875,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.0005104169831611216,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.00044417381286621094,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 431838011,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.7125603742562652,
+            0.7126137461291577,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "47701a53-f8f1-4ced-967f-4dced2307470",
+          "shots": 128,
+          "counts": {
+            "010110": 1,
+            "010101": 1,
+            "100101": 21,
+            "011010": 8,
+            "101001": 43,
+            "011001": 31,
+            "100110": 12,
+            "101010": 11
+          },
+          "raw_measurement_counts": {
+            "110": 1,
+            "111": 1,
+            "011": 21,
+            "100": 8,
+            "001": 43,
+            "101": 31,
+            "010": 12,
+            "000": 11
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.006893125013448298,
+          "mean_energy": 83.953125,
+          "raw_feasible_rate": 0.4375,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.00043462502071633935,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0003769397735595703,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 1039894373,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.7125603742562652,
+            0.2126137461291578,
+            1.114734038724675
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "89245a36-de77-4a8c-9e0f-2cee4b4df795",
+          "shots": 128,
+          "counts": {
+            "010110": 9,
+            "010101": 28,
+            "100110": 5,
+            "101010": 11,
+            "011001": 10,
+            "011010": 8,
+            "100101": 12,
+            "101001": 45
+          },
+          "raw_measurement_counts": {
+            "110": 9,
+            "111": 28,
+            "010": 5,
+            "000": 11,
+            "101": 10,
+            "100": 8,
+            "011": 12,
+            "001": 45
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.008011790981981903,
+          "mean_energy": 64.015625,
+          "raw_feasible_rate": 0.7265625,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.00042212498374283314,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.000370025634765625,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 1353131591,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.3406470308801879,
+            0.8936880541374221,
+            0.07277432977586293,
+            0.1964446070316911
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "ed16dec5-4b24-4199-b58e-c46dc5aa0f7b",
+          "shots": 128,
+          "counts": {
+            "101001": 72,
+            "100101": 7,
+            "101010": 4,
+            "100110": 1,
+            "011001": 14,
+            "010110": 2,
+            "010101": 28
+          },
+          "raw_measurement_counts": {
+            "001": 72,
+            "011": 7,
+            "000": 4,
+            "010": 1,
+            "101": 14,
+            "110": 2,
+            "111": 28
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.009064708021469414,
+          "mean_energy": 57.59375,
+          "raw_feasible_rate": 0.828125,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.0004681249847635627,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0004088878631591797,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 207383185,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.2639723321558884,
+            0.8014531472389312,
+            0.14398418327008447,
+            0.8255120775751639
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "cbc7ca7a-be41-470a-9343-a78e8b8288d5",
+          "shots": 128,
+          "counts": {
+            "101010": 10,
+            "011001": 1,
+            "100101": 3,
+            "010101": 26,
+            "101001": 88
+          },
+          "raw_measurement_counts": {
+            "000": 10,
+            "101": 1,
+            "011": 3,
+            "111": 26,
+            "001": 88
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.009822291031014174,
+          "mean_energy": 42.9765625,
+          "raw_feasible_rate": 0.96875,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.00046966603258624673,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0004119873046875,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 211660569,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1420140397137617,
+            0.7525141408665599,
+            0.2126137461291578,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "0674bab5-ce22-4714-82c3-6ded73dcc62d",
+          "shots": 128,
+          "counts": {
+            "011001": 7,
+            "011010": 1,
+            "100101": 8,
+            "101001": 85,
+            "010101": 16,
+            "010110": 3,
+            "100110": 2,
+            "101010": 6
+          },
+          "raw_measurement_counts": {
+            "101": 7,
+            "100": 1,
+            "011": 8,
+            "001": 85,
+            "111": 16,
+            "110": 3,
+            "010": 2,
+            "000": 6
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.010783665988128632,
+          "mean_energy": 51.6484375,
+          "raw_feasible_rate": 0.859375,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.0004416659940034151,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0003879070281982422,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 1457909943,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.0513539424436793,
+            0.671508571472344,
+            0.18508513642196264,
+            0.6054593345414141
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "ebaaf865-1359-4179-aff0-d2b16bcc8c8e",
+          "shots": 128,
+          "counts": {
+            "010101": 23,
+            "010110": 2,
+            "100101": 5,
+            "101010": 6,
+            "101001": 92
+          },
+          "raw_measurement_counts": {
+            "111": 23,
+            "110": 2,
+            "011": 5,
+            "000": 6,
+            "001": 92
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.011471458012238145,
+          "mean_energy": 44.0390625,
+          "raw_feasible_rate": 0.9609375,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.0004123329999856651,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0003628730773925781,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 326856469,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.145743287817296,
+            0.7570001950324545,
+            0.19062192956871257,
+            0.6043741144501122
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "feb73657-ecda-4932-8c5f-96cc891058b3",
+          "shots": 128,
+          "counts": {
+            "011010": 1,
+            "101010": 6,
+            "010110": 4,
+            "101001": 89,
+            "010101": 28
+          },
+          "raw_measurement_counts": {
+            "100": 1,
+            "000": 6,
+            "110": 4,
+            "001": 89,
+            "111": 28
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.01259712502360344,
+          "mean_energy": 42.015625,
+          "raw_feasible_rate": 0.9921875,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.0004918749909847975,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.0004181861877441406,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 225191739,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1511708787196109,
+            0.7739918105724032,
+            0.24898684086725764,
+            0.5895972134955241
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "85e6771c-e61c-4ec5-86cc-bbe6a3dc58bf",
+          "shots": 128,
+          "counts": {
+            "101010": 6,
+            "010110": 4,
+            "010101": 23,
+            "101001": 95
+          },
+          "raw_measurement_counts": {
+            "000": 6,
+            "110": 4,
+            "111": 23,
+            "001": 95
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.013663750025443733,
+          "mean_energy": 40.4609375,
+          "raw_feasible_rate": 1.0,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.00042466603918001056,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.000370025634765625,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 387073205,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1643720595750098,
+            0.8035328048744868,
+            0.26530569323316544,
+            0.6240465028514313
+          ]
+        },
+        {
+          "role": "inference",
+          "job_id": "d5cce873-ccf3-44e7-8bf4-3f470f434528",
+          "shots": 512,
+          "counts": {
+            "011001": 1,
+            "100101": 2,
+            "101001": 361,
+            "011010": 2,
+            "010110": 10,
+            "010101": 113,
+            "100110": 1,
+            "101010": 22
+          },
+          "raw_measurement_counts": {
+            "101": 1,
+            "011": 2,
+            "001": 361,
+            "100": 2,
+            "110": 10,
+            "111": 113,
+            "010": 1,
+            "000": 22
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.014486166008282453,
+          "mean_energy": 42.48828125,
+          "raw_feasible_rate": 0.98828125,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.000535041035618633,
+            "queue_s": 0.0,
+            "upload_s": 0.0,
+            "quantum_execution_s": null,
+            "simulator_execution_s": 0.00047779083251953125,
+            "readout_s": null
+          },
+          "metadata": {
+            "seed_simulator": 2042843476,
+            "bit_order": "qubit0_left",
+            "device": "CPU",
+            "noise_provenance": null,
+            "timing_note": "Simulator execution is not physical QPU time"
+          },
+          "parameters": [
+            1.1643720595750098,
+            0.8035328048744868,
+            0.26530569323316544,
+            0.6240465028514313
+          ]
+        }
+      ],
+      "resources": {
+        "logical_qubits": 3,
+        "ancillas": 0,
+        "groups": 3,
+        "compiled_physical_qubits": 3,
+        "depth": 27,
+        "gate_counts": {
+          "rz": 32,
+          "sx": 15,
+          "cx": 8,
+          "measure": 3,
+          "barrier": 1
+        },
+        "two_qubit_gates": 8,
+        "shots": 2048,
+        "backend_calls": 13,
+        "mixer": "x",
+        "encoding": "compact_binary",
+        "original_qubo_variables": 6,
+        "capabilities": {
+          "name": "Aer ideal",
+          "execution_source": "ideal_simulator",
+          "max_qubits": 16,
+          "max_shots": 16384,
+          "is_simulator": true,
+          "verified": true,
+          "basis_gates": [
+            "rz",
+            "sx",
+            "x",
+            "cx"
+          ],
+          "coupling_map": null,
+          "noise_provenance": null
+        },
+        "parameter_origin": "seeded_initialization",
+        "statevector_bytes_lower_bound": 128
+      },
+      "parameters": [
+        1.1643720595750098,
+        0.8035328048744868,
+        0.26530569323316544,
+        0.6240465028514313
+      ],
+      "circuit_qasm3": "OPENQASM 3.0;\ninclude \"stdgates.inc\";\nbit[3] meas;\nqubit[3] q;\nrz(pi/2) q[0];\nsx q[0];\nrz(pi) q[0];\nrz(-0.4456238746521642) q[0];\nrz(pi/2) q[1];\nsx q[1];\nrz(pi/2) q[1];\nrz(-0.37374905615987963) q[1];\ncx q[0], q[1];\nrz(-2.3287441191500196) q[1];\ncx q[0], q[1];\nrz(pi/2) q[1];\nsx q[1];\nrz(3.672204040056124) q[1];\nsx q[1];\nrz(5*pi/2) q[1];\nrz(-0.25792411020662537) q[1];\nrz(pi/2) q[2];\nsx q[2];\nrz(pi/2) q[2];\nrz(-0.646873366430561) q[2];\ncx q[0], q[2];\nrz(-0.10062474588919837) q[2];\ncx q[0], q[2];\nsx q[0];\nrz(3.672204040056124) q[0];\nsx q[0];\nrz(3*pi) q[0];\nrz(-0.30752490063097637) q[0];\ncx q[0], q[1];\nrz(-1.6070656097489735) q[1];\ncx q[0], q[1];\nrz(pi/2) q[1];\nsx q[1];\nrz(4.389685659292656) q[1];\nsx q[1];\nrz(5*pi/2) q[1];\nrz(pi/2) q[2];\nsx q[2];\nrz(3.672204040056124) q[2];\nsx q[2];\nrz(5*pi/2) q[2];\nrz(-0.4464071138191593) q[2];\ncx q[0], q[2];\nrz(-0.06944110659409145) q[2];\ncx q[0], q[2];\nsx q[0];\nrz(4.389685659292656) q[0];\nsx q[0];\nrz(5*pi/2) q[0];\nrz(pi/2) q[2];\nsx q[2];\nrz(4.389685659292656) q[2];\nsx q[2];\nrz(5*pi/2) q[2];\nbarrier q[0], q[1], q[2];\nmeas[0] = measure q[0];\nmeas[1] = measure q[1];\nmeas[2] = measure q[2];\n",
+      "target_hit_s": null,
+      "status": "completed"
+    },
+    "geometry_attempts": [
+      {
+        "bits": "101010",
+        "job_id": "06effffd-e473-4824-b805-b169339ae37e",
+        "validation": {
+          "valid": true,
+          "issues": [],
+          "checked_pairs": 9,
+          "max_intersection_mm3": 0.0,
+          "checks": {
+            "solid_validity": true,
+            "mate_dimensions": true,
+            "brep_pairwise_intersections": true,
+            "load_or_manufacturing_validated": false
+          }
+        }
+      }
+    ],
+    "feedback_rules": []
+  }
+]

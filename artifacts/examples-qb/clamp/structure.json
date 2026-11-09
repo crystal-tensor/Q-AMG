@@ -1,0 +1,730 @@
+{
+  "family": "clamp",
+  "units": "mm",
+  "glb_units": "m",
+  "selected_bits": "1010100110",
+  "bit_order": "qubit0_left",
+  "decisions": {
+    "jaw": {
+      "index": 0,
+      "key": "narrow",
+      "label": "28 mm 夹爪",
+      "cost": 3,
+      "attributes": {
+        "width": 28
+      }
+    },
+    "frame": {
+      "index": 0,
+      "key": "compact",
+      "label": "34 mm 导向间距",
+      "cost": 3,
+      "attributes": {
+        "inner": 34
+      }
+    },
+    "actuator": {
+      "index": 0,
+      "key": "screw",
+      "label": "丝杆驱动",
+      "cost": 4,
+      "attributes": {
+        "type": "screw"
+      }
+    },
+    "guide": {
+      "index": 1,
+      "key": "central",
+      "label": "中央导轨",
+      "cost": 3,
+      "attributes": {
+        "type": "central"
+      }
+    },
+    "pad": {
+      "index": 0,
+      "key": "flat",
+      "label": "平面夹垫",
+      "cost": 2,
+      "attributes": {
+        "type": "flat"
+      }
+    }
+  },
+  "spec": {
+    "family": "clamp",
+    "seed": 42,
+    "groups": 5,
+    "scale": 1.0,
+    "load": "light",
+    "compact": false,
+    "shaft_length_mm": 100,
+    "opening_mm": 30,
+    "max_gear_radius_mm": null,
+    "cost_overrides": {},
+    "source_text": null
+  },
+  "groups": [
+    {
+      "id": "guidance",
+      "label": "导向组件",
+      "parent": "root"
+    },
+    {
+      "id": "fixed_jaw_group",
+      "label": "固定夹爪组件",
+      "parent": "root"
+    },
+    {
+      "id": "slider",
+      "label": "移动夹爪组件",
+      "parent": "root"
+    },
+    {
+      "id": "actuation",
+      "label": "丝杆驱动",
+      "parent": "root"
+    }
+  ],
+  "parts": [
+    {
+      "id": "base",
+      "label": "底板",
+      "parent": "root",
+      "color": [
+        0.25,
+        0.3,
+        0.37
+      ],
+      "explode_mm": [
+        0,
+        0,
+        -25
+      ],
+      "volume_mm3": 40560.0,
+      "bounds_mm": [
+        [
+          -65.00000010000001,
+          -26.000000100000005,
+          -1.0000000397205465e-07
+        ],
+        [
+          65.00000010000001,
+          26.000000100000005,
+          6.000000100000004
+        ]
+      ],
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            130,
+            52,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "id": "rail_central",
+      "label": "中央导轨",
+      "parent": "guidance",
+      "color": [
+        0.12,
+        0.67,
+        0.61
+      ],
+      "explode_mm": [
+        0,
+        0,
+        -15
+      ],
+      "volume_mm3": 1023.9999999999998,
+      "bounds_mm": [
+        [
+          14.999999899999994,
+          -4.000000100000007,
+          5.999999899999993
+        ],
+        [
+          47.00000010000001,
+          4.000000100000007,
+          10.000000100000006
+        ]
+      ],
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            32.0,
+            8,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fixed_jaw",
+      "label": "固定夹爪",
+      "parent": "fixed_jaw_group",
+      "color": [
+        0.22,
+        0.39,
+        0.65
+      ],
+      "explode_mm": [
+        -25,
+        0,
+        25
+      ],
+      "volume_mm3": 9408.0,
+      "bounds_mm": [
+        [
+          -28.5000001,
+          -14.000000100000001,
+          5.999999899999999
+        ],
+        [
+          -16.4999999,
+          14.000000100000001,
+          34.0000001
+        ]
+      ],
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            12,
+            28,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fixed_pad",
+      "label": "平面夹垫",
+      "parent": "fixed_jaw_group",
+      "color": [
+        0.96,
+        0.53,
+        0.22
+      ],
+      "explode_mm": [
+        -10,
+        0,
+        40
+      ],
+      "volume_mm3": 624.0,
+      "bounds_mm": [
+        [
+          -16.500000100000005,
+          -13.000000100000003,
+          13.999999899999997
+        ],
+        [
+          -14.999999899999997,
+          13.000000100000003,
+          30.000000100000005
+        ]
+      ],
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            1.5,
+            26,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "moving_jaw",
+      "label": "移动夹爪",
+      "parent": "slider",
+      "color": [
+        0.22,
+        0.39,
+        0.65
+      ],
+      "explode_mm": [
+        25,
+        0,
+        25
+      ],
+      "volume_mm3": 8064.0,
+      "bounds_mm": [
+        [
+          16.4999999,
+          -14.000000100000001,
+          9.999999899999999
+        ],
+        [
+          28.5000001,
+          14.000000100000001,
+          34.0000001
+        ]
+      ],
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            12,
+            28,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "id": "moving_pad",
+      "label": "平面夹垫",
+      "parent": "slider",
+      "color": [
+        0.96,
+        0.53,
+        0.22
+      ],
+      "explode_mm": [
+        10,
+        0,
+        40
+      ],
+      "volume_mm3": 624.0,
+      "bounds_mm": [
+        [
+          14.999999899999997,
+          -13.000000100000003,
+          13.999999899999997
+        ],
+        [
+          16.500000100000005,
+          13.000000100000003,
+          30.000000100000005
+        ]
+      ],
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            1.5,
+            26,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "id": "actuator_support",
+      "label": "驱动支座",
+      "parent": "actuation",
+      "color": [
+        0.22,
+        0.39,
+        0.65
+      ],
+      "explode_mm": [
+        30,
+        0,
+        15
+      ],
+      "volume_mm3": 8541.465511396016,
+      "bounds_mm": [
+        [
+          48.997622296280554,
+          -23.000000100000005,
+          5.9999998999999935
+        ],
+        [
+          57.002377703719446,
+          23.000000100000005,
+          30.000000100000005
+        ]
+      ],
+      "features": [
+        {
+          "op": "box_bore",
+          "bore_radius_mm": 3.4
+        }
+      ]
+    },
+    {
+      "id": "rod",
+      "label": "丝杆示意轴",
+      "parent": "actuation",
+      "color": [
+        0.57,
+        0.67,
+        0.76
+      ],
+      "explode_mm": [
+        55,
+        0,
+        0
+      ],
+      "volume_mm3": 1145.1105222334797,
+      "bounds_mm": [
+        [
+          28.49790201436519,
+          -3.0020979856348076,
+          18.99790201436519
+        ],
+        [
+          69.0020979856348,
+          3.0020979856348076,
+          25.00209798563481
+        ]
+      ],
+      "features": [
+        {
+          "op": "circle_extrude",
+          "radius_mm": 3,
+          "axis": "X",
+          "length_mm": 40.5
+        }
+      ]
+    },
+    {
+      "id": "knob",
+      "label": "调节旋钮",
+      "parent": "actuation",
+      "color": [
+        0.96,
+        0.53,
+        0.22
+      ],
+      "explode_mm": [
+        70,
+        0,
+        0
+      ],
+      "volume_mm3": 1206.3715789784806,
+      "bounds_mm": [
+        [
+          68.99440553830719,
+          -8.005594461692816,
+          13.994405538307184
+        ],
+        [
+          75.00559446169281,
+          8.005594461692816,
+          30.005594461692816
+        ]
+      ],
+      "features": [
+        {
+          "op": "circle_extrude",
+          "radius_mm": 8,
+          "axis": "X"
+        }
+      ]
+    }
+  ],
+  "dimensions": {
+    "jaw_width_mm": 28,
+    "guide_inner_mm": 34,
+    "opening_mm": 30,
+    "global_scale": 1.0
+  },
+  "dimensions_reference": "nominal parameters before global_scale; bounds and volumes are final mm",
+  "mates": [
+    {
+      "kind": "jaw_guide_clearance",
+      "parts": [
+        "moving_jaw"
+      ],
+      "clearance_mm": 6,
+      "minimum_mm": 4
+    }
+  ],
+  "mate_rule_reference": "nominal model coordinates before uniform global_scale",
+  "modeling_order": [
+    {
+      "part": "base",
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            130,
+            52,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "part": "rail_central",
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            32.0,
+            8,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "part": "fixed_jaw",
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            12,
+            28,
+            28
+          ]
+        }
+      ]
+    },
+    {
+      "part": "fixed_pad",
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            1.5,
+            26,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "part": "moving_jaw",
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            12,
+            28,
+            24
+          ]
+        }
+      ]
+    },
+    {
+      "part": "moving_pad",
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            1.5,
+            26,
+            16
+          ]
+        }
+      ]
+    },
+    {
+      "part": "actuator_support",
+      "features": [
+        {
+          "op": "box_bore",
+          "bore_radius_mm": 3.4
+        }
+      ]
+    },
+    {
+      "part": "rod",
+      "features": [
+        {
+          "op": "circle_extrude",
+          "radius_mm": 3,
+          "axis": "X",
+          "length_mm": 40.5
+        }
+      ]
+    },
+    {
+      "part": "knob",
+      "features": [
+        {
+          "op": "circle_extrude",
+          "radius_mm": 8,
+          "axis": "X"
+        }
+      ]
+    }
+  ],
+  "explosion": {
+    "kind": "illustrative",
+    "collision_checked": false
+  },
+  "limitations": [
+    "Polygonal gear profiles are illustrative, not involute tooth design.",
+    "No force, fatigue, thread, bearing life or manufacturing validation.",
+    "STEP stores B-rep geometry; editable parameters live in design/structure JSON."
+  ],
+  "validation": {
+    "valid": true,
+    "issues": [],
+    "checked_pairs": 1,
+    "max_intersection_mm3": 0.0,
+    "checks": {
+      "solid_validity": true,
+      "one_connected_solid_per_part": true,
+      "mate_dimensions": true,
+      "brep_pairwise_intersections": true,
+      "load_or_manufacturing_validated": false
+    }
+  },
+  "provenance": {
+    "mode": "auto",
+    "execution_source": "ideal_simulator",
+    "selected_measurement": {
+      "bits": "1010100110",
+      "kind": "direct_or_exactly_decoded",
+      "job_id": "torch-mps-be69419d3b764e4099167482d9aac196",
+      "observed_count": 2,
+      "count_scope": "all_batches_in_this_round",
+      "job_id_scope": "first batch observing the candidate"
+    },
+    "fallback_used": false,
+    "hardware_verified": false,
+    "quantum_speedup_verified": false,
+    "generation_rounds": 1
+  },
+  "disassembly": {
+    "method": "sampled_brep_translation",
+    "samples_per_move": 24,
+    "fixed_parts": [
+      "base"
+    ],
+    "moves": [
+      {
+        "part": "knob",
+        "translation_mm": [
+          249.7498639825495,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "actuator_support",
+          "base",
+          "fixed_jaw",
+          "fixed_pad",
+          "moving_jaw",
+          "moving_pad",
+          "rail_central",
+          "rod"
+        ]
+      },
+      {
+        "part": "rod",
+        "translation_mm": [
+          249.7498639825495,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "actuator_support",
+          "base",
+          "fixed_jaw",
+          "fixed_pad",
+          "moving_jaw",
+          "moving_pad",
+          "rail_central"
+        ]
+      },
+      {
+        "part": "actuator_support",
+        "translation_mm": [
+          249.7498639825495,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "fixed_jaw",
+          "fixed_pad",
+          "moving_jaw",
+          "moving_pad",
+          "rail_central"
+        ]
+      },
+      {
+        "part": "moving_pad",
+        "translation_mm": [
+          0.0,
+          0.0,
+          249.7498639825495
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "fixed_jaw",
+          "fixed_pad",
+          "moving_jaw",
+          "rail_central"
+        ]
+      },
+      {
+        "part": "moving_jaw",
+        "translation_mm": [
+          249.7498639825495,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "fixed_jaw",
+          "fixed_pad",
+          "rail_central"
+        ]
+      },
+      {
+        "part": "fixed_pad",
+        "translation_mm": [
+          0.0,
+          0.0,
+          249.7498639825495
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "fixed_jaw",
+          "rail_central"
+        ]
+      },
+      {
+        "part": "fixed_jaw",
+        "translation_mm": [
+          -249.7498639825495,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "rail_central"
+        ]
+      },
+      {
+        "part": "rail_central",
+        "translation_mm": [
+          0.0,
+          0.0,
+          -249.7498639825495
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base"
+        ]
+      }
+    ],
+    "unresolved_parts": [],
+    "complete_for_envelope_model": true,
+    "continuous_collision_proof": false,
+    "thread_tool_force_or_robot_validated": false,
+    "checked_intersections": 2,
+    "elapsed_s": 0.01893812499474734,
+    "warning": "Discrete collision samples can miss collisions between samples; not industrial disassembly certification."
+  }
+}

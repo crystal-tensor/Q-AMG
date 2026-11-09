@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="icon" href="/favicon.svg"/><title>Q-AMG · Quantum-assisted Mechanical Generation</title></head>
+<body>
+  <header><a class="brand" href="./" title="Quantum-assisted Mechanical Generation">Q<span>-AMG</span><i>Quantum-assisted Mechanical Generation</i></a><div class="header-note">图片到三维 / QB 结构采样 / 拆解与装配</div><button id="connect-api" class="text-button">连接生成服务</button><div id="runtime" class="runtime"><span class="dot"></span>正在检测计算环境</div></header>
+  <div id="connection-panel" class="connection-panel" hidden><label for="backend-url">生成服务地址</label><input id="backend-url" type="url" value="http://127.0.0.1:8765"/><button id="save-connection" class="secondary">连接</button><span>本地运行 ./scripts/demo.sh 后，可使用本机 GPU / CPU 生成。</span></div>
+  <div id="public-notice" class="public-notice" hidden>公开示例可旋转、拆解、复位和下载。生成新模型及保存合并结果，请连接本机生成服务。</div>
+  <div class="workspace">
+    <aside class="design-panel">
+      <div class="eyebrow">01 / IMAGE TO ASSEMBLY</div><h1>从一张图，走向三维。</h1><p class="intro">生成形体，以 QB 采样探索分件，再拆开、选择与重新组合。</p>
+      <div class="segmented mode-tabs"><button data-mode="image" class="active">图片生成</button><button data-mode="param">参数化机械</button></div>
+      <div id="image-controls">
+        <label for="image-file" class="upload-label">选择二维图片 <small>PNG / JPEG / WEBP 等</small><input id="image-file" type="file" accept="image/png,image/jpeg,image/webp,image/bmp,image/tiff"/><span>选择文件，或拖入图片</span></label>
+        <img id="image-preview" class="image-preview" alt="输入图片预览" hidden/>
+        <div class="form-grid"><div><label for="image-parts">期望分件数</label><input id="image-parts" type="number" min="2" max="12" value="6"/></div><div><label for="image-size">模型标尺 <small>mm</small></label><input id="image-size" type="number" min="10" max="1000" value="100"/></div></div>
+        <label for="image-resolution">生成精度</label><select id="image-resolution"><option value="64">快速预览 · 64</option><option value="128" selected>标准表面 · 128</option><option value="192">精细表面 · 192</option></select>
+        <label class="check-label"><input id="remove-background" type="checkbox" checked/>估计并移除背景</label>
+        <div id="image-model-status" class="model-status">正在检查本地图像模型…</div>
+        <p class="scope-note">单图模型推测背面与内部。分件是可编辑的形状假设，标尺需按已知尺寸校准。</p>
+      </div>
+      <div id="param-controls" hidden>
+      <label for="family">机械场景</label><div class="segmented" id="families"><button class="active" data-family="drive">传动装配</button><button data-family="clamp">夹持机构</button></div>
+      <label for="intent">设计要求 <small>可选 · 有限语法</small></label><textarea id="intent" placeholder="例如：重载齿轮装配，轴长 110 mm" rows="3"></textarea>
+      <div class="form-grid"><div><label for="load">载荷偏好</label><select id="load"><option value="light">轻量优先</option><option value="heavy">重载偏好</option></select></div><div><label for="size">设计尺寸 <small>mm</small></label><input id="size" type="number" min="70" max="150" value="100"/></div></div>
+      <div class="form-grid"><div><label for="groups">结构决策</label><select id="groups"><option value="3">3 组决策</option><option value="4">4 组决策</option><option value="5" selected>5 组决策</option></select></div><div><label for="seed">随机种子</label><input id="seed" type="number" min="0" max="2147483647" value="42"/></div></div>
+      </div>
+      <label for="encoding">量子结构编码</label><select id="encoding"><option value="compact_binary">紧凑二进制 · 每组 1 比特</option><option value="onehot">独热编码 · 每组 2 比特</option></select>
+      <label for="backend">计算后端</label><select id="backend"><option value="auto">QB · 本机 GPU 优先 / CPU</option><option value="qb">QB 原生 CPU · 理想模拟</option><option value="qb-noisy">QB 原生 CPU · 参考噪声</option><option value="classical">经典求解 · 对照</option><option value="company">公司超导 QPU · 需配置</option></select>
+      <button id="generate" class="primary"><span id="generate-label">从图片生成 3D</span><span aria-hidden="true">↗</span></button><div id="job-status" role="status" aria-live="polite" class="job-status">上传图片，或先探索下方示例。</div>
+      <div class="divider"></div><div class="eyebrow">EXAMPLES / REPRODUCIBLE</div><div class="example-buttons"><button data-example="example-chair">图片 → 椅子分件 <span>↗</span></button><button data-example="example-teapot">图片 → 茶壶分件 <span>↗</span></button><button data-example="example-drive">轴 / 轴承 / 齿轮 <span>↗</span></button><button data-example="example-clamp">夹持机构 <span>↗</span></button></div>
+      <div class="scope-note">量子部分使用 QuantumBridge 原生电路与编译。当前本机 GPU / CPU 执行模拟，真机加速尚待验证。</div>
+    </aside>
+    <main>
+      <div class="main-heading"><div><div class="eyebrow">02 / ASSEMBLY EXPLORER</div><h2 id="model-title">结构与形体，一起推敲。</h2></div><div id="validation-tag" class="tag">等待模型</div></div>
+      <div class="metrics"><div><span>独立零件</span><strong id="part-count">—</strong></div><div><span>逻辑量子比特</span><strong id="qubits">—</strong></div><div><span>测量次数</span><strong id="shots">—</strong></div><div><span>生成 / 校验 / 导出</span><strong id="duration">—</strong></div></div>
+      <div class="explorer"><div class="viewport" id="viewport"><div class="view-label" id="representation-label">3D / GENERATED PARTS</div><div class="view-help">拖动旋转 · 滚轮缩放 · Shift 点击多选</div><div id="empty" class="empty"><div class="wire-icon">◇</div><h3>一个结构，许多可能。</h3><p>选择图片，或打开一个可操作示例。</p></div><div id="selection-label" class="selection-label" hidden></div><button id="reset-camera" class="reset-camera" title="重置视角">⌖ 重置视角</button></div>
+      <aside class="tree-panel"><div class="eyebrow">PART HIERARCHY</div><h3>装配层级</h3><div id="tree" class="tree"><p class="muted">生成后显示零件树</p></div></aside></div>
+      <div class="view-controls"><button id="animate" class="secondary">▷ 示意爆炸动画</button><button id="disassemble" class="secondary" disabled>▷ 采样核验拆解</button><label for="explode">组合</label><input id="explode" type="range" min="0" max="100" value="0"/><span>展开</span><span class="small-note">采样检查不构成连续路径认证</span></div>
+      <div class="assembly-actions"><button id="reassemble" class="secondary">↶ 重新装配</button><button id="merge-parts" class="secondary" disabled>合并选中分件</button><button id="restore-parts" class="text-button" disabled>恢复原始分件</button><span id="selection-count">在零件树勾选，或按 Shift 多选</span></div>
+      <div id="source-reference" class="source-reference" hidden><img id="source-image" alt="生成所依据的二维图片"/><div><div class="eyebrow">SOURCE / SINGLE VIEW</div><strong>保留输入，核对生成。</strong><p id="image-scope">背面和不可见结构由模型推测；分件位置可调整，真实装配关系待确认。</p></div></div>
+      <section class="evidence"><div><div class="eyebrow">03 / MEASURED DECISIONS</div><h3>每个结构决策，都有来源。</h3><div id="decisions" class="decisions"><p class="muted">这里将显示测量结果与零件决策的对应关系。</p></div></div><div class="trace-card"><div class="trace-title">被选中的结构编码 <span id="source-tag">尚无记录</span></div><code id="selected-bits">—</code><div id="trace-note" class="muted">量子模拟与真机实测将明确区分。</div><button id="toggle-trace" class="text-button">查看测量记录 ↗</button></div></section>
+      <div id="trace-panel" class="trace-panel" hidden></div>
+      <div class="downloads"><span>保留结构，继续设计。</span><a id="download-step" aria-disabled="true">STEP 实体 ↗</a><a id="download-glb" aria-disabled="true">GLB 模型 ↗</a><a id="download-json" aria-disabled="true">结构与参数 ↗</a><a id="download-parts" aria-disabled="true" hidden>分件文件 ZIP ↗</a></div>
+      <div class="research-note"><span class="dot amber"></span><span id="advantage-note">当前为研究原型。量子硬件与端到端加速尚未验证。</span></div>
+    </main>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body></html>

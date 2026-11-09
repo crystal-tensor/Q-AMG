@@ -1,0 +1,317 @@
+[
+  {
+    "round": 0,
+    "problem": {
+      "spec": {
+        "family": "drive",
+        "seed": 1003,
+        "groups": 4,
+        "scale": 0.9428929882656684,
+        "load": "heavy",
+        "compact": false,
+        "shaft_length_mm": 83.91185796764856,
+        "opening_mm": 38.3267927500771,
+        "max_gear_radius_mm": null,
+        "cost_overrides": {
+          "shaft": [
+            4,
+            7
+          ],
+          "bearing": [
+            1,
+            4
+          ],
+          "gear": [
+            8,
+            15
+          ],
+          "housing": [
+            11,
+            17
+          ]
+        },
+        "source_text": null
+      },
+      "groups": [
+        {
+          "key": "shaft",
+          "label": "轴径",
+          "options": [
+            {
+              "key": "slim",
+              "label": "Ø8 mm 轴",
+              "cost": 4,
+              "attributes": {
+                "radius": 4
+              }
+            },
+            {
+              "key": "stiff",
+              "label": "Ø12 mm 轴",
+              "cost": 7,
+              "attributes": {
+                "radius": 6
+              }
+            }
+          ]
+        },
+        {
+          "key": "bearing",
+          "label": "轴承规格",
+          "options": [
+            {
+              "key": "608",
+              "label": "小孔径轴承",
+              "cost": 1,
+              "attributes": {
+                "bore": 4.25
+              }
+            },
+            {
+              "key": "6001",
+              "label": "大孔径轴承",
+              "cost": 4,
+              "attributes": {
+                "bore": 6.25
+              }
+            }
+          ]
+        },
+        {
+          "key": "gear",
+          "label": "齿轮轮廓",
+          "options": [
+            {
+              "key": "compact",
+              "label": "紧凑齿轮",
+              "cost": 8,
+              "attributes": {
+                "radius": 14,
+                "teeth": 16
+              }
+            },
+            {
+              "key": "torque",
+              "label": "大直径齿轮",
+              "cost": 15,
+              "attributes": {
+                "radius": 18,
+                "teeth": 20
+              }
+            }
+          ]
+        },
+        {
+          "key": "housing",
+          "label": "轴承座层级",
+          "options": [
+            {
+              "key": "block",
+              "label": "整体轴承座",
+              "cost": 11,
+              "attributes": {
+                "split": false
+              }
+            },
+            {
+              "key": "split",
+              "label": "分体轴承座",
+              "cost": 17,
+              "attributes": {
+                "split": true
+              }
+            }
+          ]
+        }
+      ],
+      "pairs": [
+        {
+          "left": [
+            0,
+            0
+          ],
+          "right": [
+            1,
+            1
+          ],
+          "cost": 0,
+          "forbidden": true,
+          "reason": "bearing_fit_loose"
+        },
+        {
+          "left": [
+            0,
+            1
+          ],
+          "right": [
+            1,
+            0
+          ],
+          "cost": 0,
+          "forbidden": true,
+          "reason": "bearing_bore_too_small"
+        },
+        {
+          "left": [
+            0,
+            0
+          ],
+          "right": [
+            2,
+            1
+          ],
+          "cost": 7,
+          "forbidden": false,
+          "reason": "torque_on_slim_shaft"
+        },
+        {
+          "left": [
+            2,
+            1
+          ],
+          "right": [
+            3,
+            0
+          ],
+          "cost": 3,
+          "forbidden": false,
+          "reason": "assembly_serviceability"
+        }
+      ],
+      "unary": [],
+      "penalty": 78,
+      "qubo": {
+        "linear": [
+          -74.0,
+          -71.0,
+          -77.0,
+          -74.0,
+          -70.0,
+          -63.0,
+          -67.0,
+          -61.0
+        ],
+        "quadratic": [
+          {
+            "i": 0,
+            "j": 1,
+            "value": 156
+          },
+          {
+            "i": 2,
+            "j": 3,
+            "value": 156
+          },
+          {
+            "i": 4,
+            "j": 5,
+            "value": 156
+          },
+          {
+            "i": 6,
+            "j": 7,
+            "value": 156
+          },
+          {
+            "i": 0,
+            "j": 3,
+            "value": 78
+          },
+          {
+            "i": 1,
+            "j": 2,
+            "value": 78
+          },
+          {
+            "i": 0,
+            "j": 5,
+            "value": 7
+          },
+          {
+            "i": 5,
+            "j": 6,
+            "value": 3
+          }
+        ],
+        "offset": 312,
+        "groups": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "ancillas": 0,
+        "bit_order": "qubit0_left"
+      }
+    },
+    "plan": {
+      "method": "cpsat",
+      "execution_source": "classical_cpu",
+      "candidates": [
+        {
+          "bits": "10101010",
+          "energy": 24.0,
+          "feasible": true,
+          "count": 1,
+          "first_job_id": "classical-cpsat",
+          "first_seen_s": 0.0007642079726792872
+        }
+      ],
+      "timings": {
+        "encoding_s": 1.654098741710186e-05,
+        "wall_s": 0.002375915995799005
+      },
+      "trace": [
+        {
+          "counts": {
+            "10101010": 1
+          },
+          "evaluations": 1,
+          "raw_feasible_rate": 1.0
+        }
+      ],
+      "resources": {
+        "evaluations": 1,
+        "search_workers": 2,
+        "representation": "original_categorical",
+        "repair": "none"
+      },
+      "parameters": [],
+      "circuit_qasm3": null,
+      "target_hit_s": null,
+      "status": "optimal"
+    },
+    "geometry_attempts": [
+      {
+        "bits": "10101010",
+        "job_id": "classical-cpsat",
+        "validation": {
+          "valid": true,
+          "issues": [],
+          "checked_pairs": 9,
+          "max_intersection_mm3": 0.0,
+          "checks": {
+            "solid_validity": true,
+            "one_connected_solid_per_part": true,
+            "mate_dimensions": true,
+            "brep_pairwise_intersections": true,
+            "load_or_manufacturing_validated": false
+          }
+        }
+      }
+    ],
+    "feedback_rules": []
+  }
+]

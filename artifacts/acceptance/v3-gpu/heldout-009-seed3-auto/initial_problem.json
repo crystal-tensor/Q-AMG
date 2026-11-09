@@ -1,0 +1,180 @@
+{
+  "spec": {
+    "family": "clamp",
+    "seed": 1003,
+    "groups": 3,
+    "scale": 0.9098020209587866,
+    "load": "heavy",
+    "compact": false,
+    "shaft_length_mm": 113.2430925905341,
+    "opening_mm": 44.468265580523564,
+    "max_gear_radius_mm": null,
+    "cost_overrides": {
+      "jaw": [
+        9,
+        6
+      ],
+      "frame": [
+        1,
+        14
+      ],
+      "actuator": [
+        12,
+        9
+      ]
+    },
+    "source_text": null
+  },
+  "groups": [
+    {
+      "key": "jaw",
+      "label": "夹爪宽度",
+      "options": [
+        {
+          "key": "narrow",
+          "label": "28 mm 夹爪",
+          "cost": 9,
+          "attributes": {
+            "width": 28
+          }
+        },
+        {
+          "key": "wide",
+          "label": "40 mm 夹爪",
+          "cost": 6,
+          "attributes": {
+            "width": 40
+          }
+        }
+      ]
+    },
+    {
+      "key": "frame",
+      "label": "导向间距",
+      "options": [
+        {
+          "key": "compact",
+          "label": "34 mm 导向间距",
+          "cost": 1,
+          "attributes": {
+            "inner": 34
+          }
+        },
+        {
+          "key": "wide",
+          "label": "46 mm 导向间距",
+          "cost": 14,
+          "attributes": {
+            "inner": 46
+          }
+        }
+      ]
+    },
+    {
+      "key": "actuator",
+      "label": "驱动组件",
+      "options": [
+        {
+          "key": "screw",
+          "label": "丝杆驱动",
+          "cost": 12,
+          "attributes": {
+            "type": "screw"
+          }
+        },
+        {
+          "key": "piston",
+          "label": "活塞式示意驱动",
+          "cost": 9,
+          "attributes": {
+            "type": "piston"
+          }
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "left": [
+        0,
+        1
+      ],
+      "right": [
+        1,
+        0
+      ],
+      "cost": 0,
+      "forbidden": true,
+      "reason": "jaw_guide_clearance"
+    },
+    {
+      "left": [
+        0,
+        0
+      ],
+      "right": [
+        2,
+        1
+      ],
+      "cost": 4,
+      "forbidden": false,
+      "reason": "actuator_oversized"
+    }
+  ],
+  "unary": [],
+  "penalty": 56,
+  "qubo": {
+    "linear": [
+      -47.0,
+      -50.0,
+      -55.0,
+      -42.0,
+      -44.0,
+      -47.0
+    ],
+    "quadratic": [
+      {
+        "i": 0,
+        "j": 1,
+        "value": 112
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "value": 112
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "value": 112
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "value": 56
+      },
+      {
+        "i": 0,
+        "j": 5,
+        "value": 4
+      }
+    ],
+    "offset": 168,
+    "groups": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        5
+      ]
+    ],
+    "ancillas": 0,
+    "bit_order": "qubit0_left"
+  }
+}

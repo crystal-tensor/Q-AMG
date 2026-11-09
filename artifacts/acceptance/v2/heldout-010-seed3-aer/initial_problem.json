@@ -1,0 +1,235 @@
+{
+  "spec": {
+    "family": "clamp",
+    "seed": 1003,
+    "groups": 4,
+    "scale": 1.1684038038178093,
+    "load": "light",
+    "compact": false,
+    "shaft_length_mm": 104.60032329723748,
+    "opening_mm": 41.83045836346888,
+    "max_gear_radius_mm": null,
+    "cost_overrides": {
+      "jaw": [
+        9,
+        5
+      ],
+      "frame": [
+        19,
+        11
+      ],
+      "actuator": [
+        16,
+        14
+      ],
+      "guide": [
+        4,
+        3
+      ]
+    },
+    "source_text": null
+  },
+  "groups": [
+    {
+      "key": "jaw",
+      "label": "夹爪宽度",
+      "options": [
+        {
+          "key": "narrow",
+          "label": "28 mm 夹爪",
+          "cost": 9,
+          "attributes": {
+            "width": 28
+          }
+        },
+        {
+          "key": "wide",
+          "label": "40 mm 夹爪",
+          "cost": 5,
+          "attributes": {
+            "width": 40
+          }
+        }
+      ]
+    },
+    {
+      "key": "frame",
+      "label": "导向间距",
+      "options": [
+        {
+          "key": "compact",
+          "label": "34 mm 导向间距",
+          "cost": 19,
+          "attributes": {
+            "inner": 34
+          }
+        },
+        {
+          "key": "wide",
+          "label": "46 mm 导向间距",
+          "cost": 11,
+          "attributes": {
+            "inner": 46
+          }
+        }
+      ]
+    },
+    {
+      "key": "actuator",
+      "label": "驱动组件",
+      "options": [
+        {
+          "key": "screw",
+          "label": "丝杆驱动",
+          "cost": 16,
+          "attributes": {
+            "type": "screw"
+          }
+        },
+        {
+          "key": "piston",
+          "label": "活塞式示意驱动",
+          "cost": 14,
+          "attributes": {
+            "type": "piston"
+          }
+        }
+      ]
+    },
+    {
+      "key": "guide",
+      "label": "导轨组合",
+      "options": [
+        {
+          "key": "dual",
+          "label": "双导轨",
+          "cost": 4,
+          "attributes": {
+            "type": "dual"
+          }
+        },
+        {
+          "key": "central",
+          "label": "中央导轨",
+          "cost": 3,
+          "attributes": {
+            "type": "central"
+          }
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "left": [
+        0,
+        1
+      ],
+      "right": [
+        1,
+        0
+      ],
+      "cost": 0,
+      "forbidden": true,
+      "reason": "jaw_guide_clearance"
+    },
+    {
+      "left": [
+        0,
+        0
+      ],
+      "right": [
+        2,
+        1
+      ],
+      "cost": 4,
+      "forbidden": false,
+      "reason": "actuator_oversized"
+    },
+    {
+      "left": [
+        2,
+        1
+      ],
+      "right": [
+        3,
+        0
+      ],
+      "cost": 3,
+      "forbidden": false,
+      "reason": "assembly_serviceability"
+    }
+  ],
+  "unary": [],
+  "penalty": 89,
+  "qubo": {
+    "linear": [
+      -80.0,
+      -84.0,
+      -70.0,
+      -78.0,
+      -73.0,
+      -75.0,
+      -85.0,
+      -86.0
+    ],
+    "quadratic": [
+      {
+        "i": 0,
+        "j": 1,
+        "value": 178
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "value": 178
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "value": 178
+      },
+      {
+        "i": 6,
+        "j": 7,
+        "value": 178
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "value": 89
+      },
+      {
+        "i": 0,
+        "j": 5,
+        "value": 4
+      },
+      {
+        "i": 5,
+        "j": 6,
+        "value": 3
+      }
+    ],
+    "offset": 356,
+    "groups": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        6,
+        7
+      ]
+    ],
+    "ancillas": 0,
+    "bit_order": "qubit0_left"
+  }
+}

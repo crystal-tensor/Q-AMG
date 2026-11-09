@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "q-amg"
+version = "0.2.0"
+description = "Quantum/classical hierarchical mechanical generation research prototype"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy>=2.2,<3",
+  "scipy>=1.15,<2",
+  "quantumbridge-sdk",
+  "cadquery>=2.6,<2.9",
+  "trimesh>=4.6,<5",
+  "ortools>=9.12,<10",
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.34,<1",
+  "httpx>=0.28,<1",
+  "pydantic>=2.10,<3",
+  "torch==2.12.0",
+  "pillow>=10.4,<13",
+  "manifold3d>=3,<4",
+  "scikit-image>=0.25,<1",
+  "python-multipart>=0.0.20,<1",
+  "omegaconf==2.3.0",
+  "einops>=0.8,<1",
+  "transformers==4.44.2",
+  "huggingface-hub>=0.26,<1",
+  "rembg[cpu]>=2.0.60,<3",
+  "imageio>=2.36,<3",
+]
+
+[tool.uv.sources]
+quantumbridge-sdk = { path = "vendor/quantumbridge" }
+
+[project.scripts]
+qamg = "qamg.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.3,<10", "pytest-timeout>=2.3,<3", "ruff>=0.11,<1"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/qamg"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 120
+
+[tool.ruff]
+line-length = 100
+

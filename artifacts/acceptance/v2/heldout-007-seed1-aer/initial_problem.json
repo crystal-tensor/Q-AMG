@@ -1,0 +1,255 @@
+{
+  "spec": {
+    "family": "drive",
+    "seed": 1001,
+    "groups": 4,
+    "scale": 1.150664469144536,
+    "load": "heavy",
+    "compact": false,
+    "shaft_length_mm": 116.30732954386767,
+    "opening_mm": 33.881618131476046,
+    "max_gear_radius_mm": null,
+    "cost_overrides": {
+      "shaft": [
+        8,
+        1
+      ],
+      "bearing": [
+        18,
+        6
+      ],
+      "gear": [
+        13,
+        15
+      ],
+      "housing": [
+        14,
+        9
+      ]
+    },
+    "source_text": null
+  },
+  "groups": [
+    {
+      "key": "shaft",
+      "label": "轴径",
+      "options": [
+        {
+          "key": "slim",
+          "label": "Ø8 mm 轴",
+          "cost": 8,
+          "attributes": {
+            "radius": 4
+          }
+        },
+        {
+          "key": "stiff",
+          "label": "Ø12 mm 轴",
+          "cost": 1,
+          "attributes": {
+            "radius": 6
+          }
+        }
+      ]
+    },
+    {
+      "key": "bearing",
+      "label": "轴承规格",
+      "options": [
+        {
+          "key": "608",
+          "label": "小孔径轴承",
+          "cost": 18,
+          "attributes": {
+            "bore": 4.25
+          }
+        },
+        {
+          "key": "6001",
+          "label": "大孔径轴承",
+          "cost": 6,
+          "attributes": {
+            "bore": 6.25
+          }
+        }
+      ]
+    },
+    {
+      "key": "gear",
+      "label": "齿轮轮廓",
+      "options": [
+        {
+          "key": "compact",
+          "label": "紧凑齿轮",
+          "cost": 13,
+          "attributes": {
+            "radius": 14,
+            "teeth": 16
+          }
+        },
+        {
+          "key": "torque",
+          "label": "大直径齿轮",
+          "cost": 15,
+          "attributes": {
+            "radius": 18,
+            "teeth": 20
+          }
+        }
+      ]
+    },
+    {
+      "key": "housing",
+      "label": "轴承座层级",
+      "options": [
+        {
+          "key": "block",
+          "label": "整体轴承座",
+          "cost": 14,
+          "attributes": {
+            "split": false
+          }
+        },
+        {
+          "key": "split",
+          "label": "分体轴承座",
+          "cost": 9,
+          "attributes": {
+            "split": true
+          }
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "left": [
+        0,
+        0
+      ],
+      "right": [
+        1,
+        1
+      ],
+      "cost": 0,
+      "forbidden": true,
+      "reason": "bearing_fit_loose"
+    },
+    {
+      "left": [
+        0,
+        1
+      ],
+      "right": [
+        1,
+        0
+      ],
+      "cost": 0,
+      "forbidden": true,
+      "reason": "bearing_bore_too_small"
+    },
+    {
+      "left": [
+        0,
+        0
+      ],
+      "right": [
+        2,
+        1
+      ],
+      "cost": 7,
+      "forbidden": false,
+      "reason": "torque_on_slim_shaft"
+    },
+    {
+      "left": [
+        2,
+        1
+      ],
+      "right": [
+        3,
+        0
+      ],
+      "cost": 3,
+      "forbidden": false,
+      "reason": "assembly_serviceability"
+    }
+  ],
+  "unary": [],
+  "penalty": 95,
+  "qubo": {
+    "linear": [
+      -87.0,
+      -94.0,
+      -77.0,
+      -89.0,
+      -82.0,
+      -80.0,
+      -81.0,
+      -86.0
+    ],
+    "quadratic": [
+      {
+        "i": 0,
+        "j": 1,
+        "value": 190
+      },
+      {
+        "i": 2,
+        "j": 3,
+        "value": 190
+      },
+      {
+        "i": 4,
+        "j": 5,
+        "value": 190
+      },
+      {
+        "i": 6,
+        "j": 7,
+        "value": 190
+      },
+      {
+        "i": 0,
+        "j": 3,
+        "value": 95
+      },
+      {
+        "i": 1,
+        "j": 2,
+        "value": 95
+      },
+      {
+        "i": 0,
+        "j": 5,
+        "value": 7
+      },
+      {
+        "i": 5,
+        "j": 6,
+        "value": 3
+      }
+    ],
+    "offset": 380,
+    "groups": [
+      [
+        0,
+        1
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4,
+        5
+      ],
+      [
+        6,
+        7
+      ]
+    ],
+    "ancillas": 0,
+    "bit_order": "qubit0_left"
+  }
+}

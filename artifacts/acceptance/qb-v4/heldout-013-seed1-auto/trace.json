@@ -1,0 +1,1748 @@
+[
+  {
+    "round": 0,
+    "problem": {
+      "spec": {
+        "family": "drive",
+        "seed": 1001,
+        "groups": 4,
+        "scale": 0.8627943750086781,
+        "load": "heavy",
+        "compact": false,
+        "shaft_length_mm": 75.92706376490072,
+        "opening_mm": 36.58359859686628,
+        "max_gear_radius_mm": null,
+        "cost_overrides": {
+          "shaft": [
+            7,
+            16
+          ],
+          "bearing": [
+            13,
+            17
+          ],
+          "gear": [
+            3,
+            12
+          ],
+          "housing": [
+            20,
+            1
+          ]
+        },
+        "source_text": null
+      },
+      "groups": [
+        {
+          "key": "shaft",
+          "label": "轴径",
+          "options": [
+            {
+              "key": "slim",
+              "label": "Ø8 mm 轴",
+              "cost": 7,
+              "attributes": {
+                "radius": 4
+              }
+            },
+            {
+              "key": "stiff",
+              "label": "Ø12 mm 轴",
+              "cost": 16,
+              "attributes": {
+                "radius": 6
+              }
+            }
+          ]
+        },
+        {
+          "key": "bearing",
+          "label": "轴承规格",
+          "options": [
+            {
+              "key": "608",
+              "label": "小孔径轴承",
+              "cost": 13,
+              "attributes": {
+                "bore": 4.25
+              }
+            },
+            {
+              "key": "6001",
+              "label": "大孔径轴承",
+              "cost": 17,
+              "attributes": {
+                "bore": 6.25
+              }
+            }
+          ]
+        },
+        {
+          "key": "gear",
+          "label": "齿轮轮廓",
+          "options": [
+            {
+              "key": "compact",
+              "label": "紧凑齿轮",
+              "cost": 3,
+              "attributes": {
+                "radius": 14,
+                "teeth": 16
+              }
+            },
+            {
+              "key": "torque",
+              "label": "大直径齿轮",
+              "cost": 12,
+              "attributes": {
+                "radius": 18,
+                "teeth": 20
+              }
+            }
+          ]
+        },
+        {
+          "key": "housing",
+          "label": "轴承座层级",
+          "options": [
+            {
+              "key": "block",
+              "label": "整体轴承座",
+              "cost": 20,
+              "attributes": {
+                "split": false
+              }
+            },
+            {
+              "key": "split",
+              "label": "分体轴承座",
+              "cost": 1,
+              "attributes": {
+                "split": true
+              }
+            }
+          ]
+        }
+      ],
+      "pairs": [
+        {
+          "left": [
+            0,
+            0
+          ],
+          "right": [
+            1,
+            1
+          ],
+          "cost": 0,
+          "forbidden": true,
+          "reason": "bearing_fit_loose"
+        },
+        {
+          "left": [
+            0,
+            1
+          ],
+          "right": [
+            1,
+            0
+          ],
+          "cost": 0,
+          "forbidden": true,
+          "reason": "bearing_bore_too_small"
+        },
+        {
+          "left": [
+            0,
+            0
+          ],
+          "right": [
+            2,
+            1
+          ],
+          "cost": 7,
+          "forbidden": false,
+          "reason": "torque_on_slim_shaft"
+        },
+        {
+          "left": [
+            2,
+            1
+          ],
+          "right": [
+            3,
+            0
+          ],
+          "cost": 3,
+          "forbidden": false,
+          "reason": "assembly_serviceability"
+        }
+      ],
+      "unary": [],
+      "penalty": 100,
+      "qubo": {
+        "linear": [
+          -93.0,
+          -84.0,
+          -87.0,
+          -83.0,
+          -97.0,
+          -88.0,
+          -80.0,
+          -99.0
+        ],
+        "quadratic": [
+          {
+            "i": 0,
+            "j": 1,
+            "value": 200
+          },
+          {
+            "i": 2,
+            "j": 3,
+            "value": 200
+          },
+          {
+            "i": 4,
+            "j": 5,
+            "value": 200
+          },
+          {
+            "i": 6,
+            "j": 7,
+            "value": 200
+          },
+          {
+            "i": 0,
+            "j": 3,
+            "value": 100
+          },
+          {
+            "i": 1,
+            "j": 2,
+            "value": 100
+          },
+          {
+            "i": 0,
+            "j": 5,
+            "value": 7
+          },
+          {
+            "i": 5,
+            "j": 6,
+            "value": 3
+          }
+        ],
+        "offset": 400,
+        "groups": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "ancillas": 0,
+        "bit_order": "qubit0_left"
+      }
+    },
+    "plan": {
+      "method": "qaoa_binary",
+      "execution_source": "ideal_simulator",
+      "candidates": [
+        {
+          "bits": "10101001",
+          "energy": 24.0,
+          "feasible": true,
+          "count": 76,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01011001",
+          "energy": 37.0,
+          "feasible": true,
+          "count": 60,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "10100101",
+          "energy": 40.0,
+          "feasible": true,
+          "count": 169,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "10101010",
+          "energy": 43.0,
+          "feasible": true,
+          "count": 167,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01010101",
+          "energy": 46.0,
+          "feasible": true,
+          "count": 100,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01011010",
+          "energy": 56.0,
+          "feasible": true,
+          "count": 176,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "10100110",
+          "energy": 62.0,
+          "feasible": true,
+          "count": 419,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01010110",
+          "energy": 68.0,
+          "feasible": true,
+          "count": 310,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "10011001",
+          "energy": 128.0,
+          "feasible": false,
+          "count": 32,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01101001",
+          "energy": 133.0,
+          "feasible": false,
+          "count": 23,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01100101",
+          "energy": 142.0,
+          "feasible": false,
+          "count": 77,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "10010101",
+          "energy": 144.0,
+          "feasible": false,
+          "count": 39,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "10011010",
+          "energy": 147.0,
+          "feasible": false,
+          "count": 86,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01101010",
+          "energy": 152.0,
+          "feasible": false,
+          "count": 60,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "01100110",
+          "energy": 164.0,
+          "feasible": false,
+          "count": 145,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        },
+        {
+          "bits": "10010110",
+          "energy": 166.0,
+          "feasible": false,
+          "count": 109,
+          "first_job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "first_seen_s": 0.07880712498445064
+        }
+      ],
+      "timings": {
+        "encoding_s": 3.2540992833673954e-05,
+        "circuit_build_s": 0.0010040419874712825,
+        "compilation_s": 0.05774770799325779,
+        "backend_roundtrip_s": 0.13584962487220764,
+        "classical_scoring_s": 0.002568374969996512,
+        "optimizer_controller_s": 0.023292125144507736,
+        "wall_s": 0.22049441596027464,
+        "upload_s": null,
+        "queue_s": 0.0,
+        "quantum_execution_s": null,
+        "readout_s": null,
+        "simulator_execution_s": 0.13331308588385582
+      },
+      "trace": [
+        {
+          "role": "training",
+          "job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+          "shots": 128,
+          "counts": {
+            "10010110": 18,
+            "10100110": 16,
+            "10100101": 8,
+            "10010101": 5,
+            "01101010": 6,
+            "01100110": 9,
+            "10101001": 9,
+            "01011001": 5,
+            "01010110": 9,
+            "01101001": 6,
+            "01010101": 7,
+            "10011010": 11,
+            "01011010": 6,
+            "10101010": 5,
+            "10011001": 1,
+            "01100101": 7
+          },
+          "raw_measurement_counts": {
+            "0110": 18,
+            "0010": 16,
+            "0011": 8,
+            "0111": 5,
+            "1000": 6,
+            "1010": 9,
+            "0001": 9,
+            "1101": 5,
+            "1110": 9,
+            "1001": 6,
+            "1111": 7,
+            "0100": 11,
+            "1100": 6,
+            "0000": 5,
+            "0101": 1,
+            "1011": 7
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.07880712498445064,
+          "mean_energy": 100.2421875,
+          "raw_feasible_rate": 0.5078125,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.01845737500116229,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.018146042013540864,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.0003113329876214266
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 386821106,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            0.6900759428559607,
+            0.21256037425626523,
+            0.2126137461291578,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-e341f9a609704a15afcc99d456888a80",
+          "shots": 128,
+          "counts": {
+            "10100110": 23,
+            "01011010": 9,
+            "01100110": 13,
+            "10100101": 5,
+            "10010101": 3,
+            "10101010": 8,
+            "01010110": 23,
+            "10011010": 7,
+            "01101010": 7,
+            "10010110": 12,
+            "01101001": 1,
+            "10101001": 5,
+            "01010101": 4,
+            "01100101": 5,
+            "10011001": 2,
+            "01011001": 1
+          },
+          "raw_measurement_counts": {
+            "0010": 23,
+            "1100": 9,
+            "1010": 13,
+            "0011": 5,
+            "0111": 3,
+            "0000": 8,
+            "1110": 23,
+            "0100": 7,
+            "1000": 7,
+            "0110": 12,
+            "1001": 1,
+            "0001": 5,
+            "1111": 4,
+            "1011": 5,
+            "0101": 2,
+            "1101": 1
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.0927663329639472,
+          "mean_energy": 94.7421875,
+          "raw_feasible_rate": 0.609375,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.011958333954680711,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.01183445897186175,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00012387498281896114
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 163635320,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.21256037425626523,
+            0.2126137461291578,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-303b75da6b8746a3a8345f080833081a",
+          "shots": 128,
+          "counts": {
+            "10100110": 41,
+            "01011001": 2,
+            "01010110": 28,
+            "10100101": 14,
+            "01011010": 12,
+            "10011010": 5,
+            "10101010": 9,
+            "10101001": 1,
+            "01010101": 9,
+            "01100101": 2,
+            "10010110": 1,
+            "01100110": 3,
+            "01101010": 1
+          },
+          "raw_measurement_counts": {
+            "0010": 41,
+            "1101": 2,
+            "1110": 28,
+            "0011": 14,
+            "1100": 12,
+            "0100": 5,
+            "0000": 9,
+            "0001": 1,
+            "1111": 9,
+            "1011": 2,
+            "0110": 1,
+            "1010": 3,
+            "1000": 1
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.10481200000504032,
+          "mean_energy": 65.671875,
+          "raw_feasible_rate": 0.90625,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.010288958030287176,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.010114707984030247,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00017425004625692964
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 940044422,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.7125603742562652,
+            0.2126137461291578,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-4f472d1abee6436bbed6a612138ce995",
+          "shots": 128,
+          "counts": {
+            "10100101": 14,
+            "10011010": 4,
+            "01010110": 16,
+            "01011010": 18,
+            "10100110": 37,
+            "01010101": 7,
+            "10101001": 6,
+            "10101010": 13,
+            "01100110": 2,
+            "10010101": 1,
+            "10010110": 3,
+            "01101001": 1,
+            "10011001": 1,
+            "01011001": 3,
+            "01101010": 2
+          },
+          "raw_measurement_counts": {
+            "0011": 14,
+            "0100": 4,
+            "1110": 16,
+            "1100": 18,
+            "0010": 37,
+            "1111": 7,
+            "0001": 6,
+            "0000": 13,
+            "1010": 2,
+            "0111": 1,
+            "0110": 3,
+            "1001": 1,
+            "0101": 1,
+            "1101": 3,
+            "1000": 2
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.11419870797544718,
+          "mean_energy": 64.1328125,
+          "raw_feasible_rate": 0.890625,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.007654332963284105,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.007514249999076128,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00014008296420797706
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 431838011,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.7125603742562652,
+            0.7126137461291577,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-1ab83b63bc9745f4a809094718b1421a",
+          "shots": 128,
+          "counts": {
+            "01101010": 13,
+            "01101001": 8,
+            "10010101": 4,
+            "10011001": 13,
+            "10010110": 9,
+            "01010101": 4,
+            "10100110": 3,
+            "01100101": 26,
+            "01100110": 18,
+            "10011010": 15,
+            "01011010": 2,
+            "10101010": 2,
+            "10101001": 4,
+            "10100101": 5,
+            "01011001": 2
+          },
+          "raw_measurement_counts": {
+            "1000": 13,
+            "1001": 8,
+            "0111": 4,
+            "0101": 13,
+            "0110": 9,
+            "1111": 4,
+            "0010": 3,
+            "1011": 26,
+            "1010": 18,
+            "0100": 15,
+            "1100": 2,
+            "0000": 2,
+            "0001": 4,
+            "0011": 5,
+            "1101": 2
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.12331141595495865,
+          "mean_energy": 129.3828125,
+          "raw_feasible_rate": 0.171875,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.007322374964132905,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.007227875001262873,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 9.44999628700316e-05
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 1039894373,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.7125603742562652,
+            0.7126137461291577,
+            1.114734038724675
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-f975e441598b4991ae65168ae2f673f3",
+          "shots": 128,
+          "counts": {
+            "01010110": 19,
+            "10100110": 20,
+            "10011010": 5,
+            "01101010": 6,
+            "01100110": 16,
+            "10101010": 11,
+            "10010110": 20,
+            "10100101": 8,
+            "01100101": 1,
+            "10010101": 3,
+            "01010101": 3,
+            "01011010": 10,
+            "01101001": 2,
+            "10011001": 1,
+            "10101001": 3
+          },
+          "raw_measurement_counts": {
+            "1110": 19,
+            "0010": 20,
+            "0100": 5,
+            "1000": 6,
+            "1010": 16,
+            "0000": 11,
+            "0110": 20,
+            "0011": 8,
+            "1011": 1,
+            "0111": 3,
+            "1111": 3,
+            "1100": 10,
+            "1001": 2,
+            "0101": 1,
+            "0001": 3
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.1363946659839712,
+          "mean_energy": 98.859375,
+          "raw_feasible_rate": 0.578125,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.010879084002226591,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.010724708961788565,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.0001543750404380262
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 1353131591,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.2284511996167995,
+            0.9153932299481414,
+            0.7233522767852447,
+            0.15946394715290635
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-4e67efa3739047a29261dd0ac88aab1a",
+          "shots": 128,
+          "counts": {
+            "01010110": 13,
+            "01011010": 4,
+            "10100101": 13,
+            "01011001": 7,
+            "01100110": 18,
+            "10100110": 22,
+            "10010110": 8,
+            "10101001": 3,
+            "01100101": 10,
+            "01101010": 6,
+            "10011010": 7,
+            "10101010": 9,
+            "01101001": 1,
+            "01010101": 2,
+            "10010101": 2,
+            "10011001": 3
+          },
+          "raw_measurement_counts": {
+            "1110": 13,
+            "1100": 4,
+            "0011": 13,
+            "1101": 7,
+            "1010": 18,
+            "0010": 22,
+            "0110": 8,
+            "0001": 3,
+            "1011": 10,
+            "1000": 6,
+            "0100": 7,
+            "0000": 9,
+            "1001": 1,
+            "1111": 2,
+            "0111": 2,
+            "0101": 3
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.14884137496119365,
+          "mean_energy": 95.6875,
+          "raw_feasible_rate": 0.5703125,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.010221417003776878,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.010081042011734098,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00014037499204277992
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 207383185,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.2131885885691664,
+            0.8347225258171157,
+            0.7190813472733361,
+            0.8315297593226596
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-9be8844e67c54bc2ae6692dacb048b03",
+          "shots": 128,
+          "counts": {
+            "01011010": 12,
+            "01011001": 3,
+            "10100110": 33,
+            "01010110": 24,
+            "10101010": 10,
+            "10100101": 9,
+            "10011001": 2,
+            "01100101": 4,
+            "01100110": 8,
+            "01010101": 6,
+            "01101010": 3,
+            "10010110": 4,
+            "10010101": 4,
+            "10101001": 4,
+            "10011010": 2
+          },
+          "raw_measurement_counts": {
+            "1100": 12,
+            "1101": 3,
+            "0010": 33,
+            "1110": 24,
+            "0000": 10,
+            "0011": 9,
+            "0101": 2,
+            "1011": 4,
+            "1010": 8,
+            "1111": 6,
+            "1000": 3,
+            "0110": 4,
+            "0111": 4,
+            "0001": 4,
+            "0100": 2
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.16047162498580292,
+          "mean_energy": 76.1640625,
+          "raw_feasible_rate": 0.7890625,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.009733207989484072,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.009631749999243766,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00010145799024030566
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 211660569,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.2514865017391157,
+            0.7009417143654452,
+            0.7126137461291577,
+            0.6147340387246749
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-d0a5a99dfa7349dd8c2e5e685b0b7590",
+          "shots": 128,
+          "counts": {
+            "01010110": 22,
+            "01010101": 9,
+            "10010101": 4,
+            "01011001": 4,
+            "10101010": 15,
+            "10100110": 24,
+            "01100101": 3,
+            "01101010": 5,
+            "01011010": 16,
+            "01100110": 4,
+            "10011001": 1,
+            "10100101": 11,
+            "10101001": 3,
+            "10011010": 4,
+            "01101001": 1,
+            "10010110": 2
+          },
+          "raw_measurement_counts": {
+            "1110": 22,
+            "1111": 9,
+            "0111": 4,
+            "1101": 4,
+            "0000": 15,
+            "0010": 24,
+            "1011": 3,
+            "1000": 5,
+            "1100": 16,
+            "1010": 4,
+            "0101": 1,
+            "0011": 11,
+            "0001": 3,
+            "0100": 4,
+            "1001": 1,
+            "0110": 2
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.17257474997313693,
+          "mean_energy": 71.859375,
+          "raw_feasible_rate": 0.8125,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.009679000009782612,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.009538375015836209,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00014062499394640326
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 1457909943,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.0913240807561733,
+            0.6365061509816501,
+            0.7139392130136979,
+            0.6054030156587097
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-16e3aeff30fc440fb0669a41cc9b9fc9",
+          "shots": 128,
+          "counts": {
+            "10101001": 4,
+            "01011010": 18,
+            "10100101": 7,
+            "01010110": 16,
+            "01100110": 8,
+            "10100110": 27,
+            "10101010": 17,
+            "01011001": 6,
+            "01010101": 6,
+            "10011010": 7,
+            "01101010": 1,
+            "01101001": 1,
+            "01100101": 3,
+            "10011001": 3,
+            "10010110": 2,
+            "10010101": 2
+          },
+          "raw_measurement_counts": {
+            "0001": 4,
+            "1100": 18,
+            "0011": 7,
+            "1110": 16,
+            "1010": 8,
+            "0010": 27,
+            "0000": 17,
+            "1101": 6,
+            "1111": 6,
+            "0100": 7,
+            "1000": 1,
+            "1001": 1,
+            "1011": 3,
+            "0101": 3,
+            "0110": 2,
+            "0111": 2
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.1847644579829648,
+          "mean_energy": 73.6796875,
+          "raw_feasible_rate": 0.7890625,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.010249749990180135,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.01009012496797368,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00015962502220645547
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 326856469,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1901608174034601,
+            0.7130089796415571,
+            0.7375892873662625,
+            0.613727117956613
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-04f00e73b15645f0bc3eee8c0fd6135b",
+          "shots": 128,
+          "counts": {
+            "10010110": 4,
+            "10100110": 27,
+            "01010110": 29,
+            "01101010": 1,
+            "01011010": 11,
+            "01011001": 8,
+            "10101001": 4,
+            "10011001": 1,
+            "10100101": 17,
+            "10101010": 9,
+            "10010101": 1,
+            "01100110": 7,
+            "01101001": 1,
+            "01010101": 6,
+            "10011010": 1,
+            "01100101": 1
+          },
+          "raw_measurement_counts": {
+            "0110": 4,
+            "0010": 27,
+            "1110": 29,
+            "1000": 1,
+            "1100": 11,
+            "1101": 8,
+            "0001": 4,
+            "0101": 1,
+            "0011": 17,
+            "0000": 9,
+            "0111": 1,
+            "1010": 7,
+            "1001": 1,
+            "1111": 6,
+            "0100": 1,
+            "1011": 1
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.1975107499747537,
+          "mean_energy": 67.6171875,
+          "raw_feasible_rate": 0.8671875,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.010433124960400164,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.010285666969139129,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.0001474579912610352
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 225191739,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1786171251456308,
+            0.7383275340777576,
+            0.679335580212393,
+            0.5902940582698673
+          ]
+        },
+        {
+          "role": "training",
+          "job_id": "torch-mps-55d5d32dbf214b2e8a4693fed7222e0a",
+          "shots": 128,
+          "counts": {
+            "01010101": 11,
+            "10100110": 29,
+            "10010110": 7,
+            "01010110": 14,
+            "10101010": 14,
+            "10101001": 8,
+            "10011010": 5,
+            "01011010": 11,
+            "01011001": 3,
+            "10100101": 10,
+            "01100110": 7,
+            "10011001": 1,
+            "01100101": 5,
+            "10010101": 2,
+            "01101010": 1
+          },
+          "raw_measurement_counts": {
+            "1111": 11,
+            "0010": 29,
+            "0110": 7,
+            "1110": 14,
+            "0000": 14,
+            "0001": 8,
+            "0100": 5,
+            "1100": 11,
+            "1101": 3,
+            "0011": 10,
+            "1010": 7,
+            "0101": 1,
+            "1011": 5,
+            "0111": 2,
+            "1000": 1
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.2103074579499662,
+          "mean_energy": 74.21875,
+          "raw_feasible_rate": 0.78125,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.010800666990689933,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.010689291986636817,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.00011137500405311584
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 387073205,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1934907339808727,
+            0.7306092915514321,
+            0.7129614928080702,
+            0.6316885324739071
+          ]
+        },
+        {
+          "role": "inference",
+          "job_id": "torch-mps-8a48c3981cfd485f8bee1cd63524ea58",
+          "shots": 512,
+          "counts": {
+            "10100110": 117,
+            "01011001": 16,
+            "01010110": 97,
+            "10011001": 3,
+            "01010101": 26,
+            "10101010": 45,
+            "10011010": 13,
+            "01011010": 47,
+            "10101001": 22,
+            "10100101": 48,
+            "10010101": 8,
+            "10010110": 19,
+            "01100110": 32,
+            "01100101": 10,
+            "01101010": 8,
+            "01101001": 1
+          },
+          "raw_measurement_counts": {
+            "0010": 117,
+            "1101": 16,
+            "1110": 97,
+            "0101": 3,
+            "1111": 26,
+            "0000": 45,
+            "0100": 13,
+            "1100": 47,
+            "0001": 22,
+            "0011": 48,
+            "0111": 8,
+            "0110": 19,
+            "1010": 32,
+            "1011": 10,
+            "1000": 8,
+            "1001": 1
+          },
+          "structure_encoding": "onehot",
+          "physical_encoding": "compact_binary",
+          "observed_at_s": 0.2202935409732163,
+          "mean_energy": 72.794921875,
+          "raw_feasible_rate": 0.81640625,
+          "target_shots": 0,
+          "timings": {
+            "backend_roundtrip_s": 0.007749374955892563,
+            "queue_s": 0.0,
+            "upload_s": null,
+            "simulator_execution_s": 0.007434792001731694,
+            "quantum_execution_s": null,
+            "readout_s": null,
+            "born_sampling_s": 0.0003145829541608691
+          },
+          "metadata": {
+            "device": "mps",
+            "statevector_dtype": "complex64",
+            "quantum_sdk": "QuantumBridge",
+            "gate_matrix_preparation": "CPU; included in simulator execution wall time",
+            "state_evolution_device": "mps",
+            "born_sampling_device": "cpu",
+            "upload_and_probability_readback": "Included in simulator wall time; not separately measured",
+            "bit_order": "qubit0_left",
+            "seed_sampler": 2042843476,
+            "device_synchronized_before_readout": true
+          },
+          "parameters": [
+            1.1900759428559606,
+            0.7125603742562652,
+            0.7126137461291577,
+            0.6147340387246749
+          ]
+        }
+      ],
+      "resources": {
+        "logical_qubits": 4,
+        "ancillas": 0,
+        "groups": 4,
+        "compiled_physical_qubits": 4,
+        "depth": 31,
+        "gate_counts": {
+          "rz": 46,
+          "sx": 20,
+          "cx": 12,
+          "measure": 4
+        },
+        "two_qubit_gates": 12,
+        "shots": 2048,
+        "backend_calls": 13,
+        "mixer": "x",
+        "encoding": "compact_binary",
+        "original_qubo_variables": 8,
+        "capabilities": {
+          "name": "QuantumBridge / Torch MPS statevector",
+          "execution_source": "ideal_simulator",
+          "max_qubits": 16,
+          "max_shots": 16384,
+          "is_simulator": true,
+          "verified": true,
+          "basis_gates": [
+            "rz",
+            "sx",
+            "x",
+            "cx"
+          ],
+          "coupling_map": null,
+          "noise_provenance": null,
+          "complex_bytes_per_amplitude": 8
+        },
+        "parameter_origin": "seeded_initialization",
+        "quantum_sdk": "QuantumBridge",
+        "circuit_serialization_sidecar": {
+          "name": null,
+          "metadata": {
+            "initial_layout": {
+              "0": 0,
+              "1": 1,
+              "2": 2,
+              "3": 3
+            },
+            "transpile": {
+              "optimization_level": 2,
+              "basis_gates": [
+                "rz",
+                "sx",
+                "x",
+                "cx"
+              ],
+              "analyses": {
+                "initial_layout": {
+                  "0": 0,
+                  "1": 1,
+                  "2": 2,
+                  "3": 3
+                },
+                "decomposed": [
+                  "h",
+                  "h",
+                  "h",
+                  "h",
+                  "rzz",
+                  "rzz",
+                  "rzz",
+                  "rx",
+                  "rx",
+                  "rx",
+                  "rx",
+                  "rzz",
+                  "rzz",
+                  "rzz",
+                  "rx",
+                  "rx",
+                  "rx",
+                  "rx"
+                ],
+                "global_phase_preserved": true,
+                "removed_identity": 0,
+                "cancelled_operations": 0,
+                "target_validated": true,
+                "logical_final_layout": {
+                  "0": 0,
+                  "1": 1,
+                  "2": 2,
+                  "3": 3
+                },
+                "depth": 31,
+                "structural_depth": 31,
+                "runtime_depth": 31,
+                "gate_counts": {
+                  "rz": 46,
+                  "sx": 20,
+                  "cx": 12
+                },
+                "operation_count": 78,
+                "two_qubit_gate_count": 12,
+                "pass_trace": [
+                  {
+                    "pass": "_LayoutPass",
+                    "iteration": 0,
+                    "count": 0,
+                    "changed": true,
+                    "property_version": 1
+                  },
+                  {
+                    "pass": "GateDecompositionPass",
+                    "iteration": 0,
+                    "count": 1,
+                    "changed": true,
+                    "property_version": 2
+                  },
+                  {
+                    "pass": "RemoveIdentityPass",
+                    "iteration": 0,
+                    "count": 2,
+                    "changed": false,
+                    "property_version": 2
+                  },
+                  {
+                    "pass": "CircuitOptimizationPass",
+                    "iteration": 0,
+                    "count": 3,
+                    "changed": false,
+                    "property_version": 2
+                  },
+                  {
+                    "pass": "_ValidateTargetPass",
+                    "iteration": 0,
+                    "count": 4,
+                    "changed": false,
+                    "property_version": 2
+                  },
+                  {
+                    "pass": "DepthAnalysisPass",
+                    "iteration": 0,
+                    "count": 5,
+                    "changed": false,
+                    "property_version": 2
+                  },
+                  {
+                    "pass": "GateCountAnalysisPass",
+                    "iteration": 0,
+                    "count": 6,
+                    "changed": false,
+                    "property_version": 2
+                  },
+                  {
+                    "pass": "TwoQubitCountAnalysisPass",
+                    "iteration": 0,
+                    "count": 7,
+                    "changed": false,
+                    "property_version": 2
+                  }
+                ],
+                "current_properties": {
+                  "decomposed": [
+                    "h",
+                    "h",
+                    "h",
+                    "h",
+                    "rzz",
+                    "rzz",
+                    "rzz",
+                    "rx",
+                    "rx",
+                    "rx",
+                    "rx",
+                    "rzz",
+                    "rzz",
+                    "rzz",
+                    "rx",
+                    "rx",
+                    "rx",
+                    "rx"
+                  ],
+                  "global_phase_preserved": true,
+                  "removed_identity": 0,
+                  "cancelled_operations": 0,
+                  "target_validated": true,
+                  "logical_final_layout": {
+                    "0": 0,
+                    "1": 1,
+                    "2": 2,
+                    "3": 3
+                  },
+                  "depth": 31,
+                  "structural_depth": 31,
+                  "runtime_depth": 31,
+                  "gate_counts": {
+                    "rz": 46,
+                    "sx": 20,
+                    "cx": 12
+                  },
+                  "operation_count": 78,
+                  "two_qubit_gate_count": 12
+                },
+                "compiler_report": {
+                  "input_operations": 26,
+                  "output_operations": 78,
+                  "analyses": {
+                    "initial_layout": {
+                      "0": 0,
+                      "1": 1,
+                      "2": 2,
+                      "3": 3
+                    },
+                    "decomposed": [
+                      "h",
+                      "h",
+                      "h",
+                      "h",
+                      "rzz",
+                      "rzz",
+                      "rzz",
+                      "rx",
+                      "rx",
+                      "rx",
+                      "rx",
+                      "rzz",
+                      "rzz",
+                      "rzz",
+                      "rx",
+                      "rx",
+                      "rx",
+                      "rx"
+                    ],
+                    "global_phase_preserved": true,
+                    "removed_identity": 0,
+                    "cancelled_operations": 0,
+                    "target_validated": true,
+                    "logical_final_layout": {
+                      "0": 0,
+                      "1": 1,
+                      "2": 2,
+                      "3": 3
+                    },
+                    "depth": 31,
+                    "structural_depth": 31,
+                    "runtime_depth": 31,
+                    "gate_counts": {
+                      "rz": 46,
+                      "sx": 20,
+                      "cx": 12
+                    },
+                    "operation_count": 78,
+                    "two_qubit_gate_count": 12,
+                    "pass_trace": [
+                      {
+                        "pass": "_LayoutPass",
+                        "iteration": 0,
+                        "count": 0,
+                        "changed": true,
+                        "property_version": 1
+                      },
+                      {
+                        "pass": "GateDecompositionPass",
+                        "iteration": 0,
+                        "count": 1,
+                        "changed": true,
+                        "property_version": 2
+                      },
+                      {
+                        "pass": "RemoveIdentityPass",
+                        "iteration": 0,
+                        "count": 2,
+                        "changed": false,
+                        "property_version": 2
+                      },
+                      {
+                        "pass": "CircuitOptimizationPass",
+                        "iteration": 0,
+                        "count": 3,
+                        "changed": false,
+                        "property_version": 2
+                      },
+                      {
+                        "pass": "_ValidateTargetPass",
+                        "iteration": 0,
+                        "count": 4,
+                        "changed": false,
+                        "property_version": 2
+                      },
+                      {
+                        "pass": "DepthAnalysisPass",
+                        "iteration": 0,
+                        "count": 5,
+                        "changed": false,
+                        "property_version": 2
+                      },
+                      {
+                        "pass": "GateCountAnalysisPass",
+                        "iteration": 0,
+                        "count": 6,
+                        "changed": false,
+                        "property_version": 2
+                      },
+                      {
+                        "pass": "TwoQubitCountAnalysisPass",
+                        "iteration": 0,
+                        "count": 7,
+                        "changed": false,
+                        "property_version": 2
+                      }
+                    ],
+                    "current_properties": {
+                      "decomposed": [
+                        "h",
+                        "h",
+                        "h",
+                        "h",
+                        "rzz",
+                        "rzz",
+                        "rzz",
+                        "rx",
+                        "rx",
+                        "rx",
+                        "rx",
+                        "rzz",
+                        "rzz",
+                        "rzz",
+                        "rx",
+                        "rx",
+                        "rx",
+                        "rx"
+                      ],
+                      "global_phase_preserved": true,
+                      "removed_identity": 0,
+                      "cancelled_operations": 0,
+                      "target_validated": true,
+                      "logical_final_layout": {
+                        "0": 0,
+                        "1": 1,
+                        "2": 2,
+                        "3": 3
+                      },
+                      "depth": 31,
+                      "structural_depth": 31,
+                      "runtime_depth": 31,
+                      "gate_counts": {
+                        "rz": 46,
+                        "sx": 20,
+                        "cx": 12
+                      },
+                      "operation_count": 78,
+                      "two_qubit_gate_count": 12
+                    }
+                  },
+                  "changed": true,
+                  "warnings": []
+                }
+              },
+              "changed": true
+            }
+          },
+          "parameter_uuids": {}
+        },
+        "statevector_bytes_lower_bound": 128
+      },
+      "parameters": [
+        1.1900759428559606,
+        0.7125603742562652,
+        0.7126137461291577,
+        0.6147340387246749
+      ],
+      "circuit_qasm3": "OPENQASM 3.0;\ninclude \"stdgates.inc\";\nqubit[4] q;\nbit[4] c;\ngphase(15.707963267948966);\nrz(1.5707963267948966) q[0];\nh q[0];\ns q[0];\nh q[0];\nrz(1.5707963267948966) q[0];\nrz(1.5707963267948966) q[1];\nh q[1];\ns q[1];\nh q[1];\nrz(1.5707963267948966) q[1];\nrz(1.5707963267948966) q[2];\nh q[2];\ns q[2];\nh q[2];\nrz(1.5707963267948966) q[2];\nrz(1.5707963267948966) q[3];\nh q[3];\ns q[3];\nh q[3];\nrz(1.5707963267948966) q[3];\nrz(-0.13090835371415568) q[0];\nrz(-0.095206075428476852) q[1];\nrz(-0.333221263999669) q[2];\nrz(0.48793113657094384) q[3];\ncx q[0],q[1];\nrz(-2.3801518857119213) q[1];\ncx q[0],q[1];\ncx q[0],q[2];\nrz(-0.083305315999917251) q[2];\ncx q[0],q[2];\ncx q[2],q[3];\nrz(-0.035702278285678818) q[3];\ncx q[2],q[3];\nrz(1.5707963267948966) q[0];\nh q[0];\ns q[0];\nh q[0];\nrz(4.5668201458481086) q[0];\nh q[0];\ns q[0];\nh q[0];\nrz(1.5707963267948966) q[0];\nrz(1.5707963267948966) q[1];\nh q[1];\ns q[1];\nh q[1];\nrz(4.5668201458481086) q[1];\nh q[1];\ns q[1];\nh q[1];\nrz(1.5707963267948966) q[1];\nrz(1.5707963267948966) q[2];\nh q[2];\ns q[2];\nh q[2];\nrz(4.5668201458481086) q[2];\nh q[2];\ns q[2];\nh q[2];\nrz(1.5707963267948966) q[2];\nrz(1.5707963267948966) q[3];\nh q[3];\ns q[3];\nh q[3];\nrz(4.5668201458481086) q[3];\nh q[3];\ns q[3];\nh q[3];\nrz(1.5707963267948966) q[3];\nrz(-0.078381641168189173) q[0];\nrz(-0.057004829940501212) q[1];\nrz(-0.19951690479175427) q[2];\nrz(0.29214975344506872) q[3];\ncx q[0],q[1];\nrz(-1.4251207485125303) q[1];\ncx q[0],q[1];\ncx q[0],q[2];\nrz(-0.049879226197938567) q[2];\ncx q[0],q[2];\ncx q[2],q[3];\nrz(-0.021376811227687954) q[3];\ncx q[2],q[3];\nrz(1.5707963267948966) q[0];\nh q[0];\ns q[0];\nh q[0];\nrz(4.3710607310391429) q[0];\nh q[0];\ns q[0];\nh q[0];\nrz(1.5707963267948966) q[0];\nrz(1.5707963267948966) q[1];\nh q[1];\ns q[1];\nh q[1];\nrz(4.3710607310391429) q[1];\nh q[1];\ns q[1];\nh q[1];\nrz(1.5707963267948966) q[1];\nrz(1.5707963267948966) q[2];\nh q[2];\ns q[2];\nh q[2];\nrz(4.3710607310391429) q[2];\nh q[2];\ns q[2];\nh q[2];\nrz(1.5707963267948966) q[2];\nrz(1.5707963267948966) q[3];\nh q[3];\ns q[3];\nh q[3];\nrz(4.3710607310391429) q[3];\nh q[3];\ns q[3];\nh q[3];\nrz(1.5707963267948966) q[3];\nc[0] = measure q[0];\nc[1] = measure q[1];\nc[2] = measure q[2];\nc[3] = measure q[3];\n",
+      "target_hit_s": null,
+      "status": "completed"
+    },
+    "geometry_attempts": [
+      {
+        "bits": "10101001",
+        "job_id": "torch-mps-487c5d287ccb4da481b88d12c1cc68d5",
+        "validation": {
+          "valid": true,
+          "issues": [],
+          "checked_pairs": 13,
+          "max_intersection_mm3": 0.0,
+          "checks": {
+            "solid_validity": true,
+            "one_connected_solid_per_part": true,
+            "mate_dimensions": true,
+            "brep_pairwise_intersections": true,
+            "load_or_manufacturing_validated": false
+          }
+        }
+      }
+    ],
+    "feedback_rules": []
+  }
+]

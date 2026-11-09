@@ -1,0 +1,342 @@
+[
+  {
+    "round": 0,
+    "problem": {
+      "spec": {
+        "family": "clamp",
+        "seed": 1002,
+        "groups": 5,
+        "scale": 1.0954425595559312,
+        "load": "heavy",
+        "compact": false,
+        "shaft_length_mm": 110.12525398305301,
+        "opening_mm": 36.84686197558932,
+        "max_gear_radius_mm": null,
+        "cost_overrides": {
+          "jaw": [
+            19,
+            10
+          ],
+          "frame": [
+            15,
+            19
+          ],
+          "actuator": [
+            19,
+            5
+          ],
+          "guide": [
+            1,
+            15
+          ],
+          "pad": [
+            14,
+            5
+          ]
+        },
+        "source_text": null
+      },
+      "groups": [
+        {
+          "key": "jaw",
+          "label": "夹爪宽度",
+          "options": [
+            {
+              "key": "narrow",
+              "label": "28 mm 夹爪",
+              "cost": 19,
+              "attributes": {
+                "width": 28
+              }
+            },
+            {
+              "key": "wide",
+              "label": "40 mm 夹爪",
+              "cost": 10,
+              "attributes": {
+                "width": 40
+              }
+            }
+          ]
+        },
+        {
+          "key": "frame",
+          "label": "导向间距",
+          "options": [
+            {
+              "key": "compact",
+              "label": "34 mm 导向间距",
+              "cost": 15,
+              "attributes": {
+                "inner": 34
+              }
+            },
+            {
+              "key": "wide",
+              "label": "46 mm 导向间距",
+              "cost": 19,
+              "attributes": {
+                "inner": 46
+              }
+            }
+          ]
+        },
+        {
+          "key": "actuator",
+          "label": "驱动组件",
+          "options": [
+            {
+              "key": "screw",
+              "label": "丝杆驱动",
+              "cost": 19,
+              "attributes": {
+                "type": "screw"
+              }
+            },
+            {
+              "key": "piston",
+              "label": "活塞式示意驱动",
+              "cost": 5,
+              "attributes": {
+                "type": "piston"
+              }
+            }
+          ]
+        },
+        {
+          "key": "guide",
+          "label": "导轨组合",
+          "options": [
+            {
+              "key": "dual",
+              "label": "双导轨",
+              "cost": 1,
+              "attributes": {
+                "type": "dual"
+              }
+            },
+            {
+              "key": "central",
+              "label": "中央导轨",
+              "cost": 15,
+              "attributes": {
+                "type": "central"
+              }
+            }
+          ]
+        },
+        {
+          "key": "pad",
+          "label": "夹持面",
+          "options": [
+            {
+              "key": "flat",
+              "label": "平面夹垫",
+              "cost": 14,
+              "attributes": {
+                "type": "flat"
+              }
+            },
+            {
+              "key": "grooved",
+              "label": "带槽夹垫",
+              "cost": 5,
+              "attributes": {
+                "type": "grooved"
+              }
+            }
+          ]
+        }
+      ],
+      "pairs": [
+        {
+          "left": [
+            0,
+            1
+          ],
+          "right": [
+            1,
+            0
+          ],
+          "cost": 0,
+          "forbidden": true,
+          "reason": "jaw_guide_clearance"
+        },
+        {
+          "left": [
+            0,
+            0
+          ],
+          "right": [
+            2,
+            1
+          ],
+          "cost": 4,
+          "forbidden": false,
+          "reason": "actuator_oversized"
+        },
+        {
+          "left": [
+            2,
+            1
+          ],
+          "right": [
+            3,
+            0
+          ],
+          "cost": 3,
+          "forbidden": false,
+          "reason": "assembly_serviceability"
+        }
+      ],
+      "unary": [],
+      "penalty": 130,
+      "qubo": {
+        "linear": [
+          -111.0,
+          -120.0,
+          -115.0,
+          -111.0,
+          -111.0,
+          -125.0,
+          -129.0,
+          -115.0,
+          -116.0,
+          -125.0
+        ],
+        "quadratic": [
+          {
+            "i": 0,
+            "j": 1,
+            "value": 260
+          },
+          {
+            "i": 2,
+            "j": 3,
+            "value": 260
+          },
+          {
+            "i": 4,
+            "j": 5,
+            "value": 260
+          },
+          {
+            "i": 6,
+            "j": 7,
+            "value": 260
+          },
+          {
+            "i": 8,
+            "j": 9,
+            "value": 260
+          },
+          {
+            "i": 1,
+            "j": 2,
+            "value": 130
+          },
+          {
+            "i": 0,
+            "j": 5,
+            "value": 4
+          },
+          {
+            "i": 5,
+            "j": 6,
+            "value": 3
+          }
+        ],
+        "offset": 650,
+        "groups": [
+          [
+            0,
+            1
+          ],
+          [
+            2,
+            3
+          ],
+          [
+            4,
+            5
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            8,
+            9
+          ]
+        ],
+        "ancillas": 0,
+        "bit_order": "qubit0_left"
+      }
+    },
+    "plan": {
+      "method": "cpsat",
+      "execution_source": "classical_cpu",
+      "candidates": [
+        {
+          "bits": "0101011001",
+          "energy": 43.0,
+          "feasible": true,
+          "count": 1,
+          "first_job_id": "classical-cpsat",
+          "first_seen_s": 0.0010190420434810221
+        },
+        {
+          "bits": "0101101001",
+          "energy": 54.0,
+          "feasible": true,
+          "count": 1,
+          "first_job_id": "classical-cpsat",
+          "first_seen_s": 0.0009224590030498803
+        }
+      ],
+      "timings": {
+        "encoding_s": 2.300000051036477e-05,
+        "wall_s": 0.0011107500176876783
+      },
+      "trace": [
+        {
+          "counts": {
+            "0101101001": 1,
+            "0101011001": 1
+          },
+          "evaluations": 2,
+          "raw_feasible_rate": 1.0
+        }
+      ],
+      "resources": {
+        "evaluations": 2,
+        "search_workers": 2,
+        "representation": "original_categorical",
+        "repair": "none"
+      },
+      "parameters": [],
+      "circuit_qasm3": null,
+      "target_hit_s": null,
+      "status": "optimal"
+    },
+    "geometry_attempts": [
+      {
+        "bits": "0101011001",
+        "job_id": "classical-cpsat",
+        "validation": {
+          "valid": true,
+          "issues": [],
+          "checked_pairs": 2,
+          "max_intersection_mm3": 0.0,
+          "checks": {
+            "solid_validity": true,
+            "mate_dimensions": true,
+            "brep_pairwise_intersections": true,
+            "load_or_manufacturing_validated": false
+          }
+        }
+      }
+    ],
+    "feedback_rules": []
+  }
+]

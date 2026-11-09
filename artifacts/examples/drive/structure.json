@@ -1,0 +1,888 @@
+{
+  "family": "drive",
+  "units": "mm",
+  "glb_units": "m",
+  "selected_bits": "0101010110",
+  "bit_order": "qubit0_left",
+  "decisions": {
+    "shaft": {
+      "index": 1,
+      "key": "stiff",
+      "label": "Ø12 mm 轴",
+      "cost": 3,
+      "attributes": {
+        "radius": 6
+      }
+    },
+    "bearing": {
+      "index": 1,
+      "key": "6001",
+      "label": "大孔径轴承",
+      "cost": 8,
+      "attributes": {
+        "bore": 6.25
+      }
+    },
+    "gear": {
+      "index": 1,
+      "key": "torque",
+      "label": "大直径齿轮",
+      "cost": 4,
+      "attributes": {
+        "radius": 18,
+        "teeth": 20
+      }
+    },
+    "housing": {
+      "index": 1,
+      "key": "split",
+      "label": "分体轴承座",
+      "cost": 8,
+      "attributes": {
+        "split": true
+      }
+    },
+    "guard": {
+      "index": 0,
+      "key": "open",
+      "label": "开放结构",
+      "cost": 1,
+      "attributes": {
+        "present": false
+      }
+    }
+  },
+  "spec": {
+    "family": "drive",
+    "seed": 42,
+    "groups": 5,
+    "scale": 1.0,
+    "load": "heavy",
+    "compact": false,
+    "shaft_length_mm": 100,
+    "opening_mm": 30,
+    "max_gear_radius_mm": null,
+    "cost_overrides": {},
+    "source_text": null
+  },
+  "groups": [
+    {
+      "id": "rotor",
+      "label": "转子组件",
+      "parent": "root"
+    },
+    {
+      "id": "front_support",
+      "label": "前支承组件",
+      "parent": "root"
+    },
+    {
+      "id": "rear_support",
+      "label": "后支承组件",
+      "parent": "root"
+    },
+    {
+      "id": "front_housing",
+      "label": "分体轴承座",
+      "parent": "front_support"
+    },
+    {
+      "id": "rear_housing",
+      "label": "分体轴承座",
+      "parent": "rear_support"
+    }
+  ],
+  "parts": [
+    {
+      "id": "base",
+      "label": "底座",
+      "parent": "root",
+      "color": [
+        0.25,
+        0.3,
+        0.37
+      ],
+      "explode_mm": [
+        0,
+        -30,
+        0
+      ],
+      "volume_mm3": 22400.0,
+      "bounds_mm": [
+        [
+          -25.000000100000005,
+          -30.000000100000005,
+          -6.000000100000004
+        ],
+        [
+          25.000000100000005,
+          -25.999999899999995,
+          106.00000010000001
+        ]
+      ],
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            50,
+            4,
+            112
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shaft",
+      "label": "主轴",
+      "parent": "rotor",
+      "color": [
+        0.57,
+        0.67,
+        0.76
+      ],
+      "explode_mm": [
+        0,
+        0,
+        70
+      ],
+      "volume_mm3": 11309.733552923255,
+      "bounds_mm": [
+        [
+          -6.0041958712696095,
+          -6.0041958712696095,
+          -0.004195871269609909
+        ],
+        [
+          6.0041958712696095,
+          6.0041958712696095,
+          100.00419587126962
+        ]
+      ],
+      "features": [
+        {
+          "op": "circle_extrude",
+          "radius_mm": 6,
+          "length_mm": 100
+        }
+      ]
+    },
+    {
+      "id": "gear",
+      "label": "示意齿轮",
+      "parent": "rotor",
+      "color": [
+        0.96,
+        0.53,
+        0.22
+      ],
+      "explode_mm": [
+        0,
+        0,
+        35
+      ],
+      "volume_mm3": 6258.378673543269,
+      "bounds_mm": [
+        [
+          -17.94451210719631,
+          -17.944512107196307,
+          45.99559434016691
+        ],
+        [
+          17.944512107196307,
+          17.944512107196307,
+          54.00440565983309
+        ]
+      ],
+      "features": [
+        {
+          "op": "polygon_extrude",
+          "teeth": 20,
+          "radius_mm": 18,
+          "thickness_mm": 8
+        },
+        {
+          "op": "bore",
+          "radius_mm": 6.3
+        }
+      ]
+    },
+    {
+      "id": "front_bearing",
+      "label": "前轴承",
+      "parent": "front_support",
+      "color": [
+        0.12,
+        0.67,
+        0.61
+      ],
+      "explode_mm": [
+        0,
+        0,
+        -42
+      ],
+      "volume_mm3": 2199.1148575128555,
+      "bounds_mm": [
+        [
+          -11.257867171130519,
+          -11.257867171130519,
+          15.992132828869481
+        ],
+        [
+          11.257867171130519,
+          11.257867171130519,
+          24.00786717113052
+        ]
+      ],
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "inner_radius_mm": 6.25,
+          "outer_radius_mm": 11.25,
+          "thickness_mm": 8
+        }
+      ]
+    },
+    {
+      "id": "front_housing_left",
+      "label": "轴承座左半体",
+      "parent": "front_housing",
+      "color": [
+        0.22,
+        0.39,
+        0.65
+      ],
+      "explode_mm": [
+        -40,
+        0,
+        -10
+      ],
+      "volume_mm3": 3706.154376273031,
+      "bounds_mm": [
+        [
+          -15.925000100000007,
+          -26.00000010000001,
+          15.992094565296131
+        ],
+        [
+          -0.06709456529613052,
+          16.00000010000001,
+          24.00790543470387
+        ]
+      ],
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "left",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "id": "front_housing_right",
+      "label": "轴承座右半体",
+      "parent": "front_housing",
+      "color": [
+        0.22,
+        0.39,
+        0.65
+      ],
+      "explode_mm": [
+        40,
+        0,
+        -10
+      ],
+      "volume_mm3": 3706.1543762730307,
+      "bounds_mm": [
+        [
+          0.06709456529613088,
+          -26.000000100000005,
+          15.99209456529613
+        ],
+        [
+          15.925000100000007,
+          16.000000100000005,
+          24.00790543470387
+        ]
+      ],
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "right",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "id": "rear_bearing",
+      "label": "后轴承",
+      "parent": "rear_support",
+      "color": [
+        0.12,
+        0.67,
+        0.61
+      ],
+      "explode_mm": [
+        0,
+        0,
+        42
+      ],
+      "volume_mm3": 2199.1148575128555,
+      "bounds_mm": [
+        [
+          -11.257867171130519,
+          -11.257867171130519,
+          75.99213282886949
+        ],
+        [
+          11.257867171130519,
+          11.257867171130519,
+          84.00786717113051
+        ]
+      ],
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "inner_radius_mm": 6.25,
+          "outer_radius_mm": 11.25,
+          "thickness_mm": 8
+        }
+      ]
+    },
+    {
+      "id": "rear_housing_left",
+      "label": "轴承座左半体",
+      "parent": "rear_housing",
+      "color": [
+        0.22,
+        0.39,
+        0.65
+      ],
+      "explode_mm": [
+        -40,
+        0,
+        10
+      ],
+      "volume_mm3": 3706.154376273031,
+      "bounds_mm": [
+        [
+          -15.925000100000007,
+          -26.00000010000001,
+          75.99209456529613
+        ],
+        [
+          -0.06709456529613052,
+          16.00000010000001,
+          84.00790543470387
+        ]
+      ],
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "left",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "id": "rear_housing_right",
+      "label": "轴承座右半体",
+      "parent": "rear_housing",
+      "color": [
+        0.22,
+        0.39,
+        0.65
+      ],
+      "explode_mm": [
+        40,
+        0,
+        10
+      ],
+      "volume_mm3": 3706.1543762730307,
+      "bounds_mm": [
+        [
+          0.06709456529613088,
+          -26.000000100000005,
+          75.99209456529613
+        ],
+        [
+          15.925000100000007,
+          16.000000100000005,
+          84.00790543470387
+        ]
+      ],
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "right",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "id": "front_retainer",
+      "label": "定位环",
+      "parent": "rotor",
+      "color": [
+        0.57,
+        0.67,
+        0.76
+      ],
+      "explode_mm": [
+        0,
+        0,
+        -85
+      ],
+      "volume_mm3": 246.71712506804045,
+      "bounds_mm": [
+        [
+          -8.005594461692812,
+          -8.005594461692812,
+          4.994405538307188
+        ],
+        [
+          8.005594461692812,
+          8.005594461692812,
+          8.005594461692812
+        ]
+      ],
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "outer_radius_mm": 8,
+          "inner_radius_mm": 6.15,
+          "thickness_mm": 3
+        }
+      ]
+    },
+    {
+      "id": "rear_retainer",
+      "label": "定位环",
+      "parent": "rotor",
+      "color": [
+        0.57,
+        0.67,
+        0.76
+      ],
+      "explode_mm": [
+        0,
+        0,
+        85
+      ],
+      "volume_mm3": 246.71712506804045,
+      "bounds_mm": [
+        [
+          -8.005594461692812,
+          -8.005594461692812,
+          91.99440553830719
+        ],
+        [
+          8.005594461692812,
+          8.005594461692812,
+          95.00559446169281
+        ]
+      ],
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "outer_radius_mm": 8,
+          "inner_radius_mm": 6.15,
+          "thickness_mm": 3
+        }
+      ]
+    }
+  ],
+  "dimensions": {
+    "shaft_radius_mm": 6,
+    "bearing_bore_mm": 6.25,
+    "gear_radius_mm": 18,
+    "shaft_length_mm": 100,
+    "global_scale": 1.0
+  },
+  "dimensions_reference": "nominal parameters before global_scale; bounds and volumes are final mm",
+  "mates": [
+    {
+      "kind": "shaft_bearing_fit",
+      "parts": [
+        "shaft",
+        "front_bearing"
+      ],
+      "radial_clearance_mm": 0.25,
+      "allowed_mm": [
+        0.15,
+        0.5
+      ]
+    },
+    {
+      "kind": "shaft_bearing_fit",
+      "parts": [
+        "shaft",
+        "rear_bearing"
+      ],
+      "radial_clearance_mm": 0.25,
+      "allowed_mm": [
+        0.15,
+        0.5
+      ]
+    }
+  ],
+  "mate_rule_reference": "nominal model coordinates before uniform global_scale",
+  "modeling_order": [
+    {
+      "part": "base",
+      "features": [
+        {
+          "op": "box",
+          "dimensions_mm": [
+            50,
+            4,
+            112
+          ]
+        }
+      ]
+    },
+    {
+      "part": "shaft",
+      "features": [
+        {
+          "op": "circle_extrude",
+          "radius_mm": 6,
+          "length_mm": 100
+        }
+      ]
+    },
+    {
+      "part": "gear",
+      "features": [
+        {
+          "op": "polygon_extrude",
+          "teeth": 20,
+          "radius_mm": 18,
+          "thickness_mm": 8
+        },
+        {
+          "op": "bore",
+          "radius_mm": 6.3
+        }
+      ]
+    },
+    {
+      "part": "front_bearing",
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "inner_radius_mm": 6.25,
+          "outer_radius_mm": 11.25,
+          "thickness_mm": 8
+        }
+      ]
+    },
+    {
+      "part": "front_housing_left",
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "left",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "part": "front_housing_right",
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "right",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "part": "rear_bearing",
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "inner_radius_mm": 6.25,
+          "outer_radius_mm": 11.25,
+          "thickness_mm": 8
+        }
+      ]
+    },
+    {
+      "part": "rear_housing_left",
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "left",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "part": "rear_housing_right",
+      "features": [
+        {
+          "op": "box_bore_split",
+          "side": "right",
+          "width_mm": 32,
+          "height_mm": 42,
+          "bore_mm": 11.4
+        }
+      ]
+    },
+    {
+      "part": "front_retainer",
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "outer_radius_mm": 8,
+          "inner_radius_mm": 6.15,
+          "thickness_mm": 3
+        }
+      ]
+    },
+    {
+      "part": "rear_retainer",
+      "features": [
+        {
+          "op": "annulus_extrude",
+          "outer_radius_mm": 8,
+          "inner_radius_mm": 6.15,
+          "thickness_mm": 3
+        }
+      ]
+    }
+  ],
+  "explosion": {
+    "kind": "illustrative",
+    "collision_checked": false
+  },
+  "limitations": [
+    "Polygonal gear profiles are illustrative, not involute tooth design.",
+    "No force, fatigue, thread, bearing life or manufacturing validation.",
+    "STEP stores B-rep geometry; editable parameters live in design/structure JSON."
+  ],
+  "validation": {
+    "valid": true,
+    "issues": [],
+    "checked_pairs": 13,
+    "max_intersection_mm3": 0.0,
+    "checks": {
+      "solid_validity": true,
+      "one_connected_solid_per_part": true,
+      "mate_dimensions": true,
+      "brep_pairwise_intersections": true,
+      "load_or_manufacturing_validated": false
+    }
+  },
+  "provenance": {
+    "mode": "auto",
+    "execution_source": "ideal_simulator",
+    "selected_measurement": {
+      "bits": "0101010110",
+      "kind": "direct_or_exactly_decoded",
+      "job_id": "torch-mps-199a5621de6a49989b9777143223f477",
+      "observed_count": 45,
+      "count_scope": "all_batches_in_this_round",
+      "job_id_scope": "first batch observing the candidate"
+    },
+    "fallback_used": false,
+    "hardware_verified": false,
+    "quantum_speedup_verified": false,
+    "generation_rounds": 1
+  },
+  "disassembly": {
+    "method": "sampled_brep_translation",
+    "samples_per_move": 24,
+    "fixed_parts": [
+      "base"
+    ],
+    "moves": [
+      {
+        "part": "rear_retainer",
+        "translation_mm": [
+          0.0,
+          0.0,
+          217.53739271621063
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "front_bearing",
+          "front_housing_left",
+          "front_housing_right",
+          "front_retainer",
+          "gear",
+          "rear_bearing",
+          "rear_housing_left",
+          "rear_housing_right",
+          "shaft"
+        ]
+      },
+      {
+        "part": "front_retainer",
+        "translation_mm": [
+          0.0,
+          0.0,
+          -217.53739271621063
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "front_bearing",
+          "front_housing_left",
+          "front_housing_right",
+          "gear",
+          "rear_bearing",
+          "rear_housing_left",
+          "rear_housing_right",
+          "shaft"
+        ]
+      },
+      {
+        "part": "rear_housing_right",
+        "translation_mm": [
+          217.53739271621063,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "front_bearing",
+          "front_housing_left",
+          "front_housing_right",
+          "gear",
+          "rear_bearing",
+          "rear_housing_left",
+          "shaft"
+        ]
+      },
+      {
+        "part": "rear_housing_left",
+        "translation_mm": [
+          -217.53739271621063,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "front_bearing",
+          "front_housing_left",
+          "front_housing_right",
+          "gear",
+          "rear_bearing",
+          "shaft"
+        ]
+      },
+      {
+        "part": "rear_bearing",
+        "translation_mm": [
+          0.0,
+          0.0,
+          217.53739271621063
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "front_bearing",
+          "front_housing_left",
+          "front_housing_right",
+          "gear",
+          "shaft"
+        ]
+      },
+      {
+        "part": "front_housing_right",
+        "translation_mm": [
+          217.53739271621063,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "front_bearing",
+          "front_housing_left",
+          "gear",
+          "shaft"
+        ]
+      },
+      {
+        "part": "front_housing_left",
+        "translation_mm": [
+          -217.53739271621063,
+          0.0,
+          0.0
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "front_bearing",
+          "gear",
+          "shaft"
+        ]
+      },
+      {
+        "part": "front_bearing",
+        "translation_mm": [
+          0.0,
+          0.0,
+          -217.53739271621063
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "gear",
+          "shaft"
+        ]
+      },
+      {
+        "part": "gear",
+        "translation_mm": [
+          0.0,
+          0.0,
+          217.53739271621063
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base",
+          "shaft"
+        ]
+      },
+      {
+        "part": "shaft",
+        "translation_mm": [
+          0.0,
+          0.0,
+          217.53739271621063
+        ],
+        "samples": 24,
+        "tested_against": [
+          "base"
+        ]
+      }
+    ],
+    "unresolved_parts": [],
+    "complete_for_envelope_model": true,
+    "continuous_collision_proof": false,
+    "thread_tool_force_or_robot_validated": false,
+    "checked_intersections": 13,
+    "elapsed_s": 0.08350999996764585,
+    "warning": "Discrete collision samples can miss collisions between samples; not industrial disassembly certification."
+  }
+}
