@@ -1,4 +1,4 @@
-"""Image -> neural mesh -> QB-selected part hypotheses -> split/assemble/export."""
+"""Image -> jointly generated neural parts -> QB assembly planning -> edit/export."""
 from __future__ import annotations
 
 import hashlib
@@ -12,6 +12,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 import numpy as np
 import trimesh
 
+from .assembly_plan import direction_problem, selected_disassembly, selected_vectors
 from .backends import make_backend
 from .benchmark import dump
 from .classical import solve_classical
@@ -26,12 +27,15 @@ from .mesh_parts import (
     sampled_disassembly,
     validate_partition,
 )
+from .part_model import generate_parts
 from .quantum import QuantumStructurePrior
 from .schema import Image3DSettings
 
 
 def export_parts(parts, output: Path, provenance: dict, disassembly: dict, validation: dict,
-                 labels: list[str] | None = None, members: list[list[str]] | None = None) -> dict:
+                 labels: list[str] | None = None, members: list[list[str]] | None = None,
+                 explosion_vectors: list[list[float]] | None = None,
+                 appearance: list[dict] | None = None) -> dict:
     output.mkdir(parents=True, exist_ok=True)
     directory = output/"parts"
     directory.mkdir(exist_ok=True)
@@ -51,12 +55,18 @@ def export_parts(parts, output: Path, provenance: dict, disassembly: dict, valid
         records.append({"id": id, "label": label, "parent": "generated-object",
                         "mesh_file": f"parts/{id}.ply", "volume_mm3": solid.volume(),
                         "bounds_mm": mesh.bounds.tolist(), "center_mm": centers[i].tolist(),
-                        "explode_mm": (direction*max(span*.8, 25)).tolist(),
+                        "explode_mm": explosion_vectors[i] if explosion_vectors is not None else (direction*max(span*.8, 25)).tolist(),
                         "members": members[i] if members else [id],
                         "connected_components": len(solid.decompose()),
-                        "inferred_partition": inferred})
+                        "inferred_partition": inferred,
+                        "appearance": appearance[i] if appearance else {}})
         meters = mesh.copy()
         meters.apply_scale(.001)
+        if appearance and appearance[i].get("type") == "transparent_display_proxy":
+            material = trimesh.visual.material.PBRMaterial(
+                baseColorFactor=appearance[i]["rgba"], alphaMode="BLEND", doubleSided=True,
+                metallicFactor=0., roughnessFactor=.15)
+            meters.visual = trimesh.visual.TextureVisuals(material=material)
         scene.add_geometry(meters, geom_name=id, node_name=id)
     scene.export(output/"assembly.glb")
     combined = as_trimesh(merge_solids(parts))
@@ -77,6 +87,104 @@ def export_parts(parts, output: Path, provenance: dict, disassembly: dict, valid
 
 def generate_image(data: bytes, settings: Image3DSettings, output: Path,
                    source_name: str = "image", progress=lambda _: None) -> dict:
+    if settings.image_model == "triposr-geometric":
+        return _generate_geometric_image(data, settings, output, source_name, progress)
+    return _generate_part_image(data, settings, output, source_name, progress)
+
+
+def _generate_part_image(data: bytes, settings: Image3DSettings, output: Path,
+                         source_name: str, progress) -> dict:
+    started = time.perf_counter()
+    output.mkdir(parents=True, exist_ok=True)
+    image = read_image(data)
+    image.save(output/"input.png")
+    image_sha = hashlib.sha256(data).hexdigest()
+    meshes, processed, metadata = generate_parts(image, settings, progress,
+                                                 steps=settings.denoising_steps, tokens=settings.part_tokens,
+                                                 artifact_directory=output)
+    processed.save(output/"processed.png")
+    if len(meshes) != settings.desired_parts:
+        raise ValueError("神经模型输出的部件数与请求不符，拒绝用切块补足")
+    progress("校验独立部件实体")
+    parts = [as_manifold(mesh) for mesh in meshes]
+    source = merge_solids(parts)
+    validation = validate_partition(source, parts)
+    overlap = max(0., sum(p.volume() for p in parts)-source.volume())
+    validation["generated_part_overlap_mm3"] = overlap
+    validation["generated_part_overlap_fraction"] = overlap/max(source.volume(), 1e-8)
+    validation["checks"].update({"requested_neural_part_count": len(parts) == settings.desired_parts,
+                                  "part_boundaries_from_neural_model": True,
+                                  "semantic_parts_verified": False,
+                                  "generated_parts_nonoverlapping": overlap/max(source.volume(), 1e-8) < 1e-5})
+    if not validation["valid"]:
+        raise ValueError("生成部件实体校验未通过，未替换成其他模型")
+    scene = trimesh.Scene()
+    for i, mesh in enumerate(meshes):
+        scaled = mesh.copy()
+        scaled.apply_scale(.001)
+        scene.add_geometry(scaled, node_name=f"neural-part-{i:03d}")
+    scene.export(output/"source.glb")
+    progress("构建装配方向与相互遮挡目标")
+    problem, directions, anchor = direction_problem(parts, image_sha, settings.seed)
+    dump(output/"problem.json", problem.as_dict())
+    dump(output/"design.json", {"image_sha256": image_sha, "source_name": Path(source_name).name,
+                                "settings": settings.model_dump(), "model": metadata,
+                                "anchor_part": anchor, "direction_candidates": directions,
+                                "geometric_slicing_performed": False})
+    planner = settings.planner.model_copy(update={"encoding": "compact_binary"})
+    progress("QB 采样装配展开方向" if planner.backend != "classical" else "经典对照选择装配方向")
+    before = time.perf_counter()
+    backend = make_backend(planner.backend, planner.max_qubits) if planner.backend != "classical" else None
+    result = (QuantumStructurePrior(backend).plan(problem, planner, settings.seed) if backend is not None
+              else solve_classical(problem, "cpsat", settings.seed, timeout_s=planner.timeout_s))
+    planning_s = time.perf_counter()-before
+    selected = next((c for c in result.candidates if c.feasible), None)
+    if selected is None:
+        dump(output/"trace.json", [{"round": 0, "problem": problem.as_dict(), "plan": result.as_dict()}])
+        raise ValueError("本次测量没有产生有效装配方向，已保留原始神经部件")
+    vectors = selected_vectors(problem, selected.bits, directions, len(parts))
+    if result.circuit_qasm3:
+        (output/"partition.qasm").write_text(result.circuit_qasm3)
+    progress("采样检查所选方向的拆解次序")
+    before = time.perf_counter()
+    ids = [f"part-{i:03d}" for i in range(len(parts))]
+    disassembly = selected_disassembly(parts, ids, vectors, anchor)
+    disassembly_s = time.perf_counter()-before
+    provenance = {"mode": planner.backend, "execution_source": result.execution_source,
+                  "quantum_sdk": "QuantumBridge" if backend else None,
+                  "quantum_role": "assembly_explosion_direction_selection",
+                  "selected_measurement": {"bits": selected.bits, "job_id": selected.first_job_id,
+                                           "observed_count": selected.count, "kind": "direct_or_exactly_decoded",
+                                           "count_scope": "all_batches_in_this_round", "job_id_scope": "first batch observing the candidate"},
+                  "generation_rounds": 1, "fallback_used": False, "hardware_verified": False,
+                  "quantum_speedup_verified": False, "image_sha256": image_sha,
+                  "geometry_is_inferred": True, "neural_parts_preserved": True,
+                  "geometric_slicing_performed": False}
+    dump(output/"trace.json", [{"round": 0, "problem": problem.as_dict(), "plan": result.as_dict(),
+                                "selected_explosion_vectors_mm": vectors, "disassembly": disassembly}])
+    labels = [f"生成部件 {i+1:02d}" for i in range(len(parts))]
+    structure = export_parts(parts, output, provenance, disassembly, validation, labels,
+                              explosion_vectors=vectors)
+    summary = {"status": "generated", "kind": "image3d", "spec": problem.spec.model_dump(),
+               "source_name": Path(source_name).name, "settings": settings.model_dump(),
+               "validation": validation, "provenance": provenance, "model": metadata,
+               "selected_bits": selected.bits, "decisions": problem.describe(selected.bits),
+               "part_count": len(structure["parts"]), "resources": result.resources,
+               "files": {"glb": "assembly.glb", "obj": "assembly.obj", "stl": "assembly.stl", "parts": "parts.zip",
+                         "structure": "structure.json", "trace": "trace.json", "input": "input.png"},
+               "disassembly": {"complete_for_generated_mesh": disassembly["complete_for_generated_mesh"],
+                                "moves": len(disassembly["moves"]), "continuous_collision_proof": False},
+               "timings": {"neural_generation_s": metadata["timings"]["total_s"], "planning_s": planning_s,
+                           "disassembly_s": disassembly_s, "end_to_end_s": time.perf_counter()-started},
+               "limitations": ["部件来自联合生成模型，未经真实拆件验证", "背面、内部与连接由单图推测",
+                               "按部件配色，未恢复照片纹理", "采样路径不构成连续碰撞证明"]}
+    dump(output/"run.json", summary)
+    progress("完成")
+    return summary
+
+
+def _generate_geometric_image(data: bytes, settings: Image3DSettings, output: Path,
+                               source_name: str, progress) -> dict:
     started = time.perf_counter()
     output.mkdir(parents=True, exist_ok=True)
     image = read_image(data)
@@ -185,6 +293,35 @@ def load_run_parts(directory: Path, structure: dict):
     return results
 
 
+def rename_run(source_directory: Path, labels: dict[str, str], output: Path,
+               source_run_id: str, progress=lambda _: None) -> dict:
+    structure = json.loads((source_directory/"structure.json").read_text())
+    summary = json.loads((source_directory/"run.json").read_text())
+    ids = {p["id"] for p in structure["parts"]}
+    labels = {key: value.strip() for key, value in labels.items()}
+    if not labels or not set(labels) <= ids or any(not value or len(value) > 64 for value in labels.values()):
+        raise ValueError("部件名称需为 1–64 个字符，且部件必须属于当前模型")
+    progress("保存部件名称，保留原始几何")
+    shutil.copytree(source_directory, output, dirs_exist_ok=True)
+    changes = []
+    for part in structure["parts"]:
+        if part["id"] in labels:
+            changes.append({"part": part["id"], "old_label": part["label"], "new_label": labels[part["id"]]})
+            part["label"] = labels[part["id"]]
+    provenance = {**summary["provenance"], "source_run_id": source_run_id,
+                  "original_run_id": summary.get("original_run_id", source_run_id),
+                  "edit": "part_label_annotation", "annotation_source": "user_supplied_labels",
+                  "geometry_modified": False, "quantum_resampling_performed": False}
+    structure["provenance"] = provenance
+    result = {**summary, "kind": "mesh_annotation", "source_run_id": source_run_id,
+              "original_run_id": provenance["original_run_id"], "provenance": provenance}
+    dump(output/"structure.json", structure)
+    dump(output/"run.json", result)
+    dump(output/"annotation.json", {"source_run_id": source_run_id, "changes": changes,
+                                   "geometry_modified": False, "quantum_resampling_performed": False})
+    return result
+
+
 def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
               source_run_id: str, progress=lambda _: None) -> dict:
     started = time.perf_counter()
@@ -213,9 +350,14 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
                     "complete_for_envelope_model": True, "continuous_collision_proof": False}
     provenance = {**summary["provenance"], "source_run_id": source_run_id,
                   "original_run_id": summary.get("original_run_id", source_run_id),
-                  "edit": "classical_mesh_boolean_union", "merged_ids": selected_ids}
-    export_parts(parts, output, provenance, disassembly, validation, labels, members)
-    for filename in ["input.png", "processed.png", "source.glb", "design.json", "problem.json", "trace.json"]:
+                  "edit": "classical_mesh_boolean_union", "merged_ids": selected_ids,
+                  "neural_parts_preserved": False, "edit_directions_source": "classical_centroid_layout",
+                  "quantum_resampling_performed": False}
+    if provenance.get("quantum_role") == "assembly_explosion_direction_selection":
+        provenance["quantum_role"] = "source_assembly_direction_selection"
+    appearance = [p.get("appearance", {}) for p in kept]+[{}]
+    export_parts(parts, output, provenance, disassembly, validation, labels, members, appearance=appearance)
+    for filename in ["input.png", "processed.png", "source.glb", "design.json", "problem.json", "trace.json", "container-fit.json"]:
         if (source_directory/filename).is_file():
             shutil.copy2(source_directory/filename, output/filename)
     edit_s = time.perf_counter()-started

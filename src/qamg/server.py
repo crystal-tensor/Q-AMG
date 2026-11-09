@@ -36,6 +36,10 @@ class MergeRequest(BaseModel):
     part_ids: list[str] = Field(min_length=2, max_length=32)
 
 
+class LabelRequest(BaseModel):
+    labels: dict[str, Annotated[str, Field(min_length=1, max_length=64)]] = Field(min_length=1, max_length=32)
+
+
 def create_app(output: Path | str = "artifacts/runs", web_root: Path | None = None) -> FastAPI:
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -120,15 +124,15 @@ def create_app(output: Path | str = "artifacts/runs", web_root: Path | None = No
 
     @app.get("/api/status")
     def status():
-        from .image_model import model_status
-        return {"runtime": runtime, "prototype": "bounded mechanical grammar",
+        from .part_model import model_status
+        return {"runtime": runtime, "prototype": "image part generation and bounded mechanical CAD",
                 "hardware_verified": False, "quantum_speedup_verified": False,
                 "image_frontend_available": True, "image_model": model_status(),
                 "noise_model": "generic; use QAMG_DEVICE_PROFILE for explicit device parameters"}
 
     @app.get("/api/image-model")
     def image_model():
-        from .image_model import model_status
+        from .part_model import model_status
         return model_status()
 
     @app.post("/api/parse")
@@ -164,12 +168,44 @@ def create_app(output: Path | str = "artifacts/runs", web_root: Path | None = No
     def submit_merge(source_id: str, request: MergeRequest):
         from .image_pipeline import merge_run
         directory = resolve(source_id)
+        review = directory/"quality-review.json"
+        if review.exists() and json.loads(review.read_text()).get("accepted") is False:
+            raise HTTPException(409, "此结果未通过部件核对，请重新生成")
         structure = json.loads((directory/"structure.json").read_text())
         if len(set(request.part_ids)) != len(request.part_ids) or not set(request.part_ids) <= {p["id"] for p in structure["parts"]}:
             raise HTTPException(422, "请选择当前模型中至少两个不同的分件")
         id = enqueue()
         executor.submit(run_action, id, lambda notify: merge_run(directory, request.part_ids, output/id, source_id, notify))
         return {"id": id, "status": "queued", "kind": "mesh_edit"}
+
+    @app.post("/api/runs/{source_id}/labels", status_code=202)
+    def submit_labels(source_id: str, request: LabelRequest):
+        from .image_pipeline import rename_run
+        directory = resolve(source_id)
+        review = directory/"quality-review.json"
+        if review.exists() and json.loads(review.read_text()).get("accepted") is False:
+            raise HTTPException(409, "此结果未通过部件核对，请重新生成")
+        structure = json.loads((directory/"structure.json").read_text())
+        if not set(request.labels) <= {p["id"] for p in structure["parts"]}:
+            raise HTTPException(422, "部件不属于当前模型")
+        id = enqueue()
+        executor.submit(run_action, id, lambda notify: rename_run(directory, request.labels, output/id, source_id, notify))
+        return {"id": id, "status": "queued", "kind": "mesh_annotation"}
+
+    @app.post("/api/runs/{source_id}/container-fit", status_code=202)
+    def submit_container_fit(source_id: str):
+        from .container_fit import fit_container
+        directory = resolve(source_id)
+        summary_path = directory/"run.json"
+        summary = json.loads(summary_path.read_text()) if summary_path.is_file() else {}
+        if (summary.get("status") != "generated" or summary.get("spec", {}).get("family") != "image_parts"
+                or not (directory/"input.png").is_file()):
+            raise HTTPException(422, "此操作需要一个已生成的图像三维外形参考")
+        # Explicit assisted repair can use a semantically rejected neural reference;
+        # it creates a new run and does not upgrade the source's quality review.
+        id = enqueue()
+        executor.submit(run_action, id, lambda notify: fit_container(directory, output/id, source_id, notify))
+        return {"id": id, "status": "queued", "kind": "assisted_image3d"}
 
     @app.get("/api/jobs/{id}")
     def job(id: str):
@@ -181,26 +217,40 @@ def create_app(output: Path | str = "artifacts/runs", web_root: Path | None = No
     @app.get("/api/runs")
     def runs():
         result = []
-        for path in sorted((PROJECT_ROOT/"artifacts"/"examples").glob("*/run.json")):
+        for name in ["robot", "drive", "clamp"]:
+            path = PROJECT_ROOT/"artifacts"/"examples"/name/"run.json"
+            if not path.is_file():
+                continue
             summary = json.loads(path.read_text())
+            if summary.get("spec", {}).get("family") == "image_parts":
+                review = path.parent/"quality-review.json"
+                if not review.is_file() or not json.loads(review.read_text()).get("accepted"):
+                    continue
             if summary.get("status") == "generated":
                 result.append({"id": f"example-{path.parent.name}", "summary": summary})
         for path in sorted(output.glob("*/run.json"), key=lambda p: p.stat().st_mtime, reverse=True)[:20]:
             summary = json.loads(path.read_text())
-            if summary["status"] == "generated":
+            review = path.parent/"quality-review.json"
+            rejected = review.exists() and json.loads(review.read_text()).get("accepted") is False
+            if summary["status"] == "generated" and not rejected:
                 result.append({"id": path.parent.name, "summary": summary})
         return result
 
     @app.get("/api/runs/{id}/{filename}")
     def file(id: str, filename: str):
         allowed = {"run.json", "assembly.step", "assembly.glb", "structure.json",
-                   "trace.json", "design.json", "problem.json", "disassembly.json", "merge.json",
-                   "input.png", "processed.png", "source.glb", "assembly.obj", "assembly.stl", "parts.zip"}
+                   "trace.json", "design.json", "problem.json", "disassembly.json", "merge.json", "annotation.json",
+                   "input.png", "processed.png", "source.glb", "assembly.obj", "assembly.stl", "parts.zip", "quality-review.json",
+                   "container-fit.json", "foreground-mask.png", "lid-mask.png", "sleeve-mask.png"}
         if filename not in allowed:
             raise HTTPException(404, "Unknown artifact")
         path = resolve(id)/filename
         if not path.is_file():
             raise HTTPException(404, "Artifact not yet available")
+        if filename == "run.json" and (path.parent/"quality-review.json").exists():
+            summary = json.loads(path.read_text())
+            summary["quality_review"] = json.loads((path.parent/"quality-review.json").read_text())
+            return JSONResponse(summary)
         return FileResponse(path)
 
     @app.get("/api/experiments")

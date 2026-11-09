@@ -34,7 +34,9 @@ def snapshot_sources(directory: Path) -> dict:
     root = Path(__file__).resolve().parents[2]
     paths = sorted((root/"src").rglob("*.py")) + [root/"pyproject.toml", root/"uv.lock"]
     paths += [root/"vendor/SOURCES.json"]
-    for name in ["quantumbridge", "triposr"]:
+    paths += [root/"configs/partcrafter-files.json", root/"configs/vision-model.json"]
+    paths += sorted((root/"configs/partcrafter").rglob("*.json"))
+    for name in ["quantumbridge", "triposr", "partcrafter", "sam2"]:
         vendor = root/"vendor"/name
         paths += sorted(vendor.rglob("*.py"))
         paths += [p for p in [vendor/"pyproject.toml", vendor/"LICENSE", vendor/"THIRD_PARTY_NOTICES.md"] if p.exists()]

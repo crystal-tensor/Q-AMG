@@ -5,6 +5,7 @@ Uploaded images never participate in these network requests.
 """
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import subprocess
@@ -33,8 +34,14 @@ def sha256(path):
 
 
 def main():
-    manifest = {}
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--background-only", action="store_true")
+    args = parser.parse_args()
+    manifest_path = ROOT/"models/manifest.json"
+    manifest = json.loads(manifest_path.read_text()) if manifest_path.exists() else {}
     for relative, (url, expected) in FILES.items():
+        if args.background_only and not relative.startswith("background/"):
+            continue
         target = ROOT/"models"/relative
         target.parent.mkdir(parents=True, exist_ok=True)
         if not target.exists():

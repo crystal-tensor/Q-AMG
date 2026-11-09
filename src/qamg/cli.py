@@ -23,16 +23,19 @@ def main():
         p.add_argument("--encoding", choices=["onehot", "compact_binary"], default="onehot")
     examples = sub.add_parser("examples", help="Build both example assemblies using measured circuits")
     examples.add_argument("--output", type=Path, default=Path("artifacts/examples"))
-    image = sub.add_parser("image", help="Generate a neural 3D mesh and QB-selected editable parts from an image")
+    image = sub.add_parser("image", help="Generate independent neural parts with QB-selected assembly directions")
     image.add_argument("--input", type=Path, required=True)
     image.add_argument("--output", type=Path, required=True)
     image.add_argument("--resolution", type=int, default=128)
-    image.add_argument("--parts", type=int, default=6)
+    image.add_argument("--parts", type=int, default=3)
     image.add_argument("--size-mm", type=float, default=100)
     image.add_argument("--seed", type=int, default=42)
     image.add_argument("--keep-background", action="store_true")
     image.add_argument("--device", choices=["auto", "cpu", "gpu"], default="auto")
     image.add_argument("--backend", choices=["auto", "qb", "qb-noisy", "company", "classical"], default="auto")
+    image.add_argument("--image-model", choices=["partcrafter", "triposr-geometric"], default="partcrafter")
+    image.add_argument("--steps", type=int, default=50)
+    image.add_argument("--tokens", type=int, choices=[512, 1024], default=1024)
     bench = sub.add_parser("benchmark", help="Run preregistered held-out solver experiments")
     bench.add_argument("--output", type=Path, required=True)
     bench.add_argument("--instances", type=int, default=30)
@@ -81,6 +84,7 @@ def main():
     elif args.command == "image":
         from .image_pipeline import generate_image
         settings = Image3DSettings(resolution=args.resolution, desired_parts=args.parts,
+                                    image_model=args.image_model, denoising_steps=args.steps, part_tokens=args.tokens,
                                     size_mm=args.size_mm, seed=args.seed, device=args.device,
                                     remove_background=not args.keep_background,
                                     planner=PlannerSettings(backend=args.backend, encoding="compact_binary",

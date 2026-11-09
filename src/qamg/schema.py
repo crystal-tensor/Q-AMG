@@ -36,14 +36,17 @@ class PlannerSettings(BaseModel):
 
 
 class Image3DSettings(BaseModel):
+    image_model: Literal["partcrafter", "triposr-geometric"] = "partcrafter"
     resolution: int = Field(default=128, ge=64, le=192)
-    desired_parts: int = Field(default=6, ge=2, le=12)
+    desired_parts: int = Field(default=3, ge=2, le=12)
     size_mm: float = Field(default=100, ge=10, le=1000)
     seed: int = Field(default=42, ge=0, le=2**31-1)
     remove_background: bool = True
     foreground_ratio: float = Field(default=.85, ge=.5, le=.95)
     density_threshold: float = Field(default=25, ge=1, le=100)
     device: Literal["auto", "cpu", "gpu"] = "auto"
+    denoising_steps: int = Field(default=50, ge=10, le=80)
+    part_tokens: Literal[512, 1024] = 1024
     planner: PlannerSettings = Field(default_factory=lambda: PlannerSettings(
         encoding="compact_binary", iterations=6, depth=1, shots=512))
 

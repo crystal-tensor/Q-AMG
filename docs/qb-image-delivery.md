@@ -1,5 +1,7 @@
 # Q-AMG 0.2：QB 与图片生成交付
 
+> 历史功能记录，保留原始数据。下面的 TripoSR 几何切片通过的是实体、布尔和接口检查，**没有通过真实部件语义识别验收**，也不再是默认图片路径。当前实现与透明杯修正见 [部件与识图修正](part-aware-delivery.md)。旧计时不能代表当前 PartCrafter/SAM2 管线。
+
 项目已更名为 **Q-AMG（Quantum-assisted Mechanical Generation）**。本版将应用运行时迁移到 QuantumBridge，并实现通用图片输入、生成式三维、候选分件、拆解、布尔合并与原分件恢复。
 
 ## 实际执行证据

@@ -63,13 +63,18 @@ def test_invalid_image_refuses_before_neural_inference():
 
 
 def test_upload_qb_partition_merge_and_source_restoration_contract(tmp_path, monkeypatch):
-    # Explicit model stub only for the HTTP/export contract; real TripoSR runs
+    # Explicit model stub only for the HTTP/export contract; real neural runs
     # are saved separately and never established by this unit test.
     def model_stub(image, settings, progress):
-        return cube(), image.convert("RGB"), {"model": "contract-stub-not-TripoSR", "timings": {"total_s": 0}}
+        parts = []
+        for i in range(3):
+            mesh = cube()
+            mesh.apply_translation([0, 0, i*70])
+            parts.append(mesh)
+        return parts, image.convert("RGB"), {"model": "contract-stub-not-PartCrafter", "timings": {"total_s": 0}}
 
-    monkeypatch.setattr(image_pipeline, "generate_mesh", model_stub)
-    settings = Image3DSettings(planner={"backend": "qb", "encoding": "compact_binary", "iterations": 0,
+    monkeypatch.setattr(image_pipeline, "generate_parts", lambda image, settings, progress, **kwargs: model_stub(image, settings, progress))
+    settings = Image3DSettings(desired_parts=3, planner={"backend": "qb", "encoding": "compact_binary", "iterations": 0,
                                        "depth": 1, "shots": 256})
     with TestClient(create_app(tmp_path/"runs", web_root=tmp_path/"no-web")) as client:
         invalid = client.post("/api/generate-image", files={"file": ("bad.png", b"invalid", "image/png")})
@@ -90,12 +95,25 @@ def test_upload_qb_partition_merge_and_source_restoration_contract(tmp_path, mon
         id = response.json()["id"]
         summary = wait(id)
         assert summary["provenance"]["quantum_sdk"] == "QuantumBridge"
-        assert summary["validation"]["valid"] and summary["part_count"] >= 2
+        assert summary["validation"]["valid"] and summary["part_count"] == 3
+        assert summary["provenance"]["geometric_slicing_performed"] is False
+        assert summary["provenance"]["quantum_role"] == "assembly_explosion_direction_selection"
         trace = client.get(f"/api/runs/{id}/trace.json").json()[0]["plan"]["trace"]
         bits = summary["selected_bits"]
         assert any(bits in batch["counts"] for batch in trace)
         structure = client.get(f"/api/runs/{id}/structure.json").json()
+        from qamg.assembly_plan import direction_problem, selected_vectors
+        expected_problem, directions, _ = direction_problem([as_manifold(m) for m in model_stub(read_image(png()), settings, None)[0]],
+                                                            summary["provenance"]["image_sha256"], 42)
+        assert [p["explode_mm"] for p in structure["parts"]] == selected_vectors(expected_problem, bits, directions, 3)
         chosen = [p["id"] for p in structure["parts"][:2]]
+        rename = client.post(f"/api/runs/{id}/labels", json={"labels": {chosen[0]: "盖子"}})
+        annotation_id = rename.json()["id"]
+        annotated = wait(annotation_id)
+        assert annotated["part_count"] == 3 and annotated["provenance"]["geometry_modified"] is False
+        assert client.get(f"/api/runs/{annotation_id}/assembly.glb").content == client.get(f"/api/runs/{id}/assembly.glb").content
+        assert client.get(f"/api/runs/{annotation_id}/structure.json").json()["parts"][0]["label"] == "盖子"
+        assert client.get(f"/api/runs/{id}/structure.json").json()["parts"][0]["label"] != "盖子"
         merge = client.post(f"/api/runs/{id}/merge", json={"part_ids": chosen})
         merged_id = merge.json()["id"]
         merged = wait(merged_id)

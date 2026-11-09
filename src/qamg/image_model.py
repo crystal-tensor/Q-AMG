@@ -58,7 +58,8 @@ def _background_session():
                                providers=["CPUExecutionProvider"])
 
 
-def prepare_image(image: Image.Image, settings: Image3DSettings) -> tuple[Image.Image, dict]:
+def prepare_image(image: Image.Image, settings: Image3DSettings, *, clean_foreground: bool = False,
+                  background: float = .5, mask_path: Path | None = None) -> tuple[Image.Image, dict]:
     rgba = np.asarray(image)
     alpha = rgba[..., 3].astype(np.float32)/255
     method = "input_alpha"
@@ -74,19 +75,42 @@ def prepare_image(image: Image.Image, settings: Image3DSettings) -> tuple[Image.
         method = "u2netp_foreground_estimate"
     elif not settings.remove_background:
         method = "full_image_with_input_alpha"
+    cleanup = None
+    refinement = None
+    if clean_foreground and method == "u2netp_foreground_estimate":
+        from scipy import ndimage
+        occupied = alpha >= .45
+        components, count = ndimage.label(occupied)
+        if count:
+            areas = np.bincount(components.ravel())
+            areas[0] = 0
+            largest = components == int(areas.argmax())
+            largest = ndimage.binary_closing(largest, iterations=2)
+            cleanup = {"method": "largest_foreground_component_hard_mask", "threshold": .45,
+                       "components_before": count, "retained_pixels": int(largest.sum())}
+            alpha = largest.astype(np.float32)
+            from .vision import model_ready, refine_foreground
+            if model_ready():
+                alpha, refinement = refine_foreground(image, largest, settings.device)
     occupied = alpha > .1
     if occupied.sum() < 16:
         raise ValueError("未找到足够的前景，请关闭背景移除或使用主体更清晰的图片")
+    if mask_path is not None:
+        mask_path.parent.mkdir(parents=True, exist_ok=True)
+        Image.fromarray(np.uint8(np.clip(alpha, 0, 1)*255)).save(mask_path)
     yy, xx = np.where(occupied)
     bbox = (int(xx.min()), int(yy.min()), int(xx.max()+1), int(yy.max()+1))
     rgb = rgba[..., :3].astype(np.float32)/255
-    composited = rgb*alpha[..., None]+.5*(1-alpha[..., None])
+    composited = rgb*alpha[..., None]+background*(1-alpha[..., None])
     cropped = Image.fromarray(np.uint8(np.clip(composited, 0, 1)*255)).crop(bbox)
     side = max(cropped.size)
     canvas_side = max(side, round(side/settings.foreground_ratio))
-    canvas = Image.new("RGB", (canvas_side, canvas_side), (128, 128, 128))
+    background_rgb = round(background*255)
+    canvas = Image.new("RGB", (canvas_side, canvas_side), (background_rgb,)*3)
     canvas.paste(cropped, ((canvas_side-cropped.width)//2, (canvas_side-cropped.height)//2))
-    return canvas, {"method": method, "foreground_bbox_px": list(bbox),
+    return canvas, {"method": method, "cleanup": cleanup, "visual_refinement": refinement,
+                    "background_rgb": background_rgb,
+                    "foreground_bbox_px": list(bbox),
                     "foreground_fraction": float(occupied.mean()), "input_size_px": list(image.size)}
 
 

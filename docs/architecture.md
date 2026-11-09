@@ -19,7 +19,12 @@
 ## 模块边界
 
 ```
-frontends.py        有限文本语法；图片前端 Protocol（未接模型）
+frontends.py        有限文本语法；图像前端接口
+vision.py           本地 SAM2.1 large 主体分割
+part_model.py       PartCrafter 独立部件联合生成与碎片核对
+image_pipeline.py   图片几何校验、布尔合并、命名与导出
+assembly_plan.py    QB 测量选择展开方向，离散次序检查
+container_fit.py    显式杯类先验辅助拟合，保留假设和原神经参考
 schema.py           输入、求解配置、选项与校验结构
 problem.py          原始分类选择、约束、QUBO/Ising、精确二进制替换
 quantum.py          QuantumStructurePrior / QuantumPlanner，真实电路采样
@@ -94,22 +99,26 @@ time-to-target 在整个测量批次返回并完成解码后才记为命中，�
 要在子流程达到 1.2 倍，必须满足 `T_QPU及往返 < T_最佳经典/1.2 - T_主机编码编译等开销`。若右侧为负，仅换更快的 QPU 仍不够，需要改变摊销方式、编码、算法或任务规模。当前只有 3–5 个分类变量的任务经典参考极快，不能把减少门数直接换算成端到端的量子加速倍数。
 
 
-## Q-AMG 0.2：QB 原生迁移与通用图片入口
+## QB 原生迁移与当前图片入口
 
 当前项目名为 **Q-AMG（Quantum-assisted Mechanical Generation）**。QuantumBridge 固定到公开提交 `e12cdbcbfc17fab83cc744b4d537746e428c99c8`。使用原生 Circuit、ParameterVector、transpile、StatevectorDevice、DensityMatrixDevice、噪声模型与序列化；应用环境不安装 Qiskit/Aer/PennyLane。原生 SDK 源码和许可随项目保存，用户本机另一个 QB 开发仓库未作修改。
 
 QB 使用 q0-first 位序。GPU 适配器读取 QB 的控制/目标线序和 gate_matrix，按同一张量顺序演化；经典测量寄存器另行映射。QB 编译元数据保存于序列化 sidecar，标准 QASM 不承载的信息不会静默丢弃。[QB 原生源码](https://github.com/crystal-tensor/QuantumBridge/tree/e12cdbcbfc17fab83cc744b4d537746e428c99c8/quantumbridge)
 
-图片入口使用固定版本的 [TripoSR](https://github.com/VAST-AI-Research/TripoSR)，它由单图预测三平面特征，再查询密度/颜色并提取等值面。原始权重不训练、不修改。项目对其增加 CPU marching cubes、本地 DINO 配置与延迟背景依赖；这些适配及许可在 vendor/SOURCES.json 中记录。背景由小型 U2NetP 估计，已有透明通道优先沿用。
+默认图片路径使用固定版本的 [PartCrafter](https://github.com/wgsxm/PartCrafter)。DINOv2 编码输入，具备局部/全局注意力与部件 ID 的去噪器联合生成各部件 latent，再由原生 TripoSG VAE 查询 SDF、提取各自表面。背景由 U2NetP 粗估，SAM2.1 large 根据主体框和前景点细化；它不负责凭空识别隐藏机械连接。已有透明通道优先沿用。
 
 ```
-图片 → 前景/参考标尺 → 本地 TripoSR → 封闭网格
-     → 几何/颜色切面候选 → QB QAOA 采样
-     → 实体分件 → 并集/对称差验证 → 展开/采样拆解/合并与恢复
+图片 → SAM2 前景/参考标尺 → 本地 PartCrafter 联合生成各部件
+     → 实体/碎片核对 → 方向碰撞代价 → QB QAOA 测量选择方向
+     → 并集/对称差验证 → 单件查看/命名/展开/采样拆解/合并与恢复
 ```
 
-`mesh_parts.py` 从形状截面和颜色差提出最多九个切面候选。每组二元选择表示保留连接或切开，QB 测量必须决定实际使用的切面。目标包含候选评分与软切面数量惩罚。该简化子目标可利用排序和遍历切面数进行强经典求解；当前规模非常容易，不能包装成量子优势实例。后续更丰富的语义相容性需要真实标注与实验。
+采样器必须使用权重配置中的 `RectifiedFlowScheduler`；其速度场更新符号与通用 SD3 调度器不同，测试以独立常速度 ODE 验证。视觉编码器保持 FP32；本机 MPS FP16 的特征比较未通过 CPU 参照。应用不静默用固定模型替代失败结果，也不生成占位部件。
 
-`image_pipeline.py` 只接受来自本次采样的候选；切分后检查实体和并集对称差。Manifold 为切面封口，隐藏的截面内容仍是几何假设。合并使用真实网格布尔并集，结果保存为新运行，原分件与源图保留。参考标尺不等于测量尺寸；图片网格不声称有原生 CAD 特征历史、真实内部连接或制造认证。
+`assembly_plan.py` 计算六个轴向平移的离散交叠代价，保留每件两个候选，并加入展开后部件拥挤代价。最终导出向量必须来自实际观测到的 QB 候选。量子测量没有生成神经部件边界，方向子问题很小且容易经典求解。合并使用真实网格布尔并集，保存新运行；原分件与源图保留。参考标尺不等于测量尺寸。
+
+透明杯的辅助修正是单独的显式操作：采用盖子/杯体/杯套旋转体先验，从二维主体侧轮廓拟合锥度与杯套比例，以神经参考估计标尺。空心壁、间隙和盖子提片属于显式形状假设。第一轮 QB 测量选择界面与配合参数，实际几何验证后，第二轮 QB 测量选择以杯体为固定件的方向。保留每轮见证、QASM、全部 shots 与峰值比特；不把这个受约束过程称为通用自动部件恢复。
+
+`TripoSR` 的三平面密度/颜色查询和几何切面候选仍保留为显式 `triposr-geometric` 历史路径。旧记录不修改，不作为当前语义验收结果。
 
 神经模型在 GPU 上运行，缺少支持 GPU 时执行同一 CPU 模型。模型准备会固定权重、配置和校验值；图片推理阶段没有外部图片 API。冷/热启动、不同分辨率、CPU/GPU 与量子模拟/真机数据必须分别报告。

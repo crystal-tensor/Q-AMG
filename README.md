@@ -1,82 +1,83 @@
 # Q-AMG · Quantum-assisted Mechanical Generation
 
-量子辅助机械生成、拆解与装配系统。量子部分使用公司开源的 [QuantumBridge](https://github.com/crystal-tensor/QuantumBridge) 原生 SDK。
+量子辅助机械生成、拆解与装配系统，量子部分使用公司开源 [QuantumBridge](https://github.com/crystal-tensor/QuantumBridge) 原生 SDK。
 
-[在线演示](https://crystal-tensor.github.io/Q-AMG/) · [架构与算法](docs/architecture.md) · [本版验收](docs/qb-image-delivery.md) · [超导接入](docs/company-protocol.md)
+[在线页面](https://crystal-tensor.github.io/Q-AMG/) · [架构](docs/architecture.md) · [部件与识图修正](docs/part-aware-delivery.md) · [历史 QB 迁移验收](docs/qb-image-delivery.md) · [超导接入](docs/company-protocol.md)
 
-支持上传二维图片，生成带颜色的三维网格，再由 QB 电路采样决定候选分件，进行封闭切分、拆解展示、选件合并与恢复。另保留传动装配和夹持机构两类参数化 CAD，支持 STEP 导出。
+图片路径使用 SAM2.1 large 提取主体，PartCrafter 联合生成指定数量的独立部件，再由 QB 测量选择装配展开方向。支持逐件查看、命名、展开、重新装配、布尔合并及恢复原始分件。传动装配和夹持机构保留参数化 CAD 与 STEP 导出。
 
-图片入口适用于不同物体类别，当前已实际验证椅子、茶壶和机器人。单图的背面、内部、真实尺寸与装配连接没有唯一答案；生成结果和分件属于推测，不能当作制造级逆向工程结果。
-
-![图片生成与分件示例](artifacts/qamg-image-assembled.png)
+部件数量是用户给定的约束。单张照片无法唯一确定背面、内部、真实尺寸和制造连接；生成部件需要与原图逐件核对。网格有效、并集一致和数量正确均不等于恢复了真实机械 BOM。
 
 ## 启动
 
-需要 Python 3.12、uv、Node.js 24、npm 与 curl。依赖使用 `uv.lock` 和 `web/package-lock.json` 锁定。
+需要 Python 3.12、uv、Node.js 24、npm 与 curl。
 
 ```bash
 ./scripts/demo.sh
 ```
 
-打开 [本机应用](http://127.0.0.1:8765/)。首次启动会下载约 1.68 GB 的 TripoSR 权重及较小的配置/前景模型，支持断点续传并核对 SHA-256。后续推理使用本地文件，上传图片不发送到外部模型 API。
+打开 [本机应用](http://127.0.0.1:8765/)。首次准备约 4.9 GB 的公开模型文件，支持分段下载、重试与 SHA-256 校验。权重不进入 Git。后续推理在本机运行，上传图片不发送到外部模型 API。
 
-默认优先使用 CUDA 或 Apple Metal GPU；没有受支持 GPU 时使用 CPU。本机已经实跑 MPS GPU 和完整 CPU 图片路径。
+默认优先使用 CUDA / Apple Metal GPU；无 GPU 使用 CPU。部件生成的标准设置为 50 步、每部件 1024 tokens；实际耗时取决于部件数和设备。图像编码使用单精度，避免本机已实测的 MPS 半精度特征偏差。
 
-只运行参数化机械功能时可跳过图片权重准备：
+只使用参数化机械功能时可跳过图片模型：
 
 ```bash
 QAMG_SKIP_IMAGE_MODEL=1 ./scripts/demo.sh
 ```
 
-## 图片、拆解与合并
+## 图片到部件
 
-1. 选择 PNG、JPEG、WEBP、BMP 或 TIFF 图片，设置参考标尺与期望分件数。
-2. TripoSR 生成三维外观；QB 采样切面组合，形成可追踪的分件决策。
-3. 使用示意爆炸动画或离散碰撞采样序列查看拆解。
-4. 在零件树勾选、或 Shift 点击多选，执行布尔合并；可以恢复原始分件。
-5. 下载 GLB、OBJ、STL、结构 JSON 与分件 ZIP。图片网格没有伪造 STEP 特征历史。
+1. 上传 PNG、JPEG、WEBP、BMP 或 TIFF，指定部件数量与参考标尺。
+2. 模型联合生成各个部件，不使用平面切块来凑数；空输出和明显碎片会报告失败。
+3. 逐件选择，使用“只看选中部件”核对形状，并保存名称。
+4. 使用示意爆炸、离散碰撞采样序列、重新装配和选件合并。
+5. 下载 GLB、OBJ、STL、结构 JSON 和分件 ZIP。
 
-合并验证比较实体并集与原模型的对称差。体积、形状与原始运行记录保留；空间上不相连的组合仍可能包含多个连通实体。离散碰撞采样不是连续路径认证。
+生成失败会清空当前结果，避免把先前模型误认为本次输入的结果。原始图像、预处理、原始神经输出、失败、测量记录及修改来源均保留。命名和合并产生新运行，原运行可恢复。
 
-命令行入口：
+当前神经部件使用区分部件的配色，未恢复照片纹理。离散碰撞采样不能认证连续路径、工具空间或真实连接。图片网格不伪造 STEP 特征历史。
+
+透明杯等困难输入可显式选择“杯类结构辅助重建”，限定盖子、杯子、杯套三个角色：从 SAM 轮廓估计杯身锥度、杯套比例和区域颜色，结合神经外形标尺生成连续空心杯体、独立环形杯套与连通盖子近似件。QB 测量选择界面、壁厚/间隙候选及展开方向。这个模式使用旋转体结构先验；盖子提片、不可见内壁、密封与配合均不能当成照片恢复的制造真值。原神经结果与辅助重建分别保存。
 
 ```bash
-uv run --locked qamg doctor
-uv run --locked qamg image --input /absolute/path/image.png --output artifacts/runs/my-image
-uv run --locked qamg image --input /absolute/path/image.png --device cpu --backend qb --resolution 64 --output artifacts/runs/cpu-image
+uv run --locked qamg image --input /absolute/path/image.png --parts 3 --output artifacts/runs/my-image
+uv run --locked qamg image --input /absolute/path/image.png --parts 3 --device cpu --backend qb --steps 30 --tokens 512 --output artifacts/runs/cpu-image
 uv run --locked qamg generate --spec examples/drive.json --encoding compact_binary --output artifacts/runs/my-drive
-uv run --locked qamg generate --text '重载齿轮装配，轴长110mm，最大齿轮半径15mm' --encoding compact_binary --output artifacts/runs/feedback
 ```
 
-## QB 与计算后端
+较少步数和 tokens 可用于预览，仍需核对输出质量。`--resolution` 控制表面采样，无法恢复照片里不可见的工程信息。
 
-- `auto`：QB 原生电路/编译，Torch CUDA/MPS 态演化；无 GPU 使用 QB 原生 CPU。
-- `qb`：QuantumBridge StatevectorDevice 与原生采样。
-- `qb-noisy`：QuantumBridge DensityMatrixDevice、原生门噪声与读出噪声，明确为参考模拟。
-- `company`：QB 编译、序列化后提交显式配置的公司服务，参考协议见接入文档。
-- `classical`：同一原问题的显式经典对照。
+## QB 的作用
 
-应用依赖已移除 Qiskit、Aer 和 PennyLane。测试会阻断这些 SDK 的导入，并执行 QB 电路、编译、采样和序列化。第三方 SDK 源码中保留其自身的可选兼容模块；应用不通过这些模块转发量子执行。
+QB 原生电路、编译、采样、噪声模拟与序列化参与结构规划。图片路径保留神经部件边界，测量结果决定导出的展开方向；合并后若使用经典布局，会明确记录其来源。
 
-QB 与 TripoSR 的版本、许可和适配修改记录于 [vendor/SOURCES.json](vendor/SOURCES.json)。模型权重不放进 Git，下载来源与校验值在 [准备脚本](scripts/prepare_models.py) 和 `models/manifest.json`。
+- `auto`：QB 电路 / 编译与 Torch CUDA/MPS 模拟，无 GPU 使用 QB 原生 CPU。
+- `qb`：QuantumBridge 原生 StatevectorDevice。
+- `qb-noisy`：原生 DensityMatrixDevice 和参考噪声，明确为模拟。
+- `company`：显式配置公司的超导服务与预算后提交，见接入文档。
+- `classical`：同一原问题的经典对照。
 
-## 测试与复现
+应用不通过 Qiskit、Aer 或 PennyLane 执行。测试阻断这些 SDK 后执行 QB 原生链路。
+
+当前小规模方向子问题容易经典求解。真实量子加速与公司 QPU 尚未验证，不能把本机模拟结果当作量子加速证明。
+
+## 验证与复现
 
 ```bash
 ./scripts/test.sh
+uv run --locked python scripts/validate_vision_precision.py --output artifacts/new-vision-check
 ./scripts/benchmark.sh
-uv run --locked python scripts/validate_image_examples.py --output artifacts/my-image-evidence
-uv run --locked python scripts/validate_outputs.py --corpus artifacts/benchmarks/registered-v2/corpus.json --output artifacts/my-cad-acceptance --quantum-backend auto
 ```
 
-实验使用新目录，保留原始记录、失败、源码与依赖。历史实验使用旧 SDK，存档保持原样；不能把旧结果当作 QB 或真实 QPU 的新测量。
+原生采样调度器必须与权重配置一致，测试核对其更新方向及配置；另核对引导分支中的部件编号一致性、QB 采样来源、几何布尔操作和接口行为。真实神经输出与测试里的接口 stub 分别记录。
 
-本版真实神经图片证据见 `artifacts/image-neural-v2/`、CPU 路径见 `artifacts/image-cpu-v1/`、浏览器上传与合并证据见 `artifacts/ui-image-evidence/`。这些样例不证明任意图片都能准确恢复隐藏工程结构。
+历史 TripoSR 几何切片、旧 SDK 实验、原始记录和失败保持原样。它们不代表当前部件识别质量或真实 QPU 的新测量。需要复现旧图片路径时，先运行 `scripts/prepare_models.py`，再显式选择 `--image-model triposr-geometric`。
 
-## 在线页面
+模型版本、许可与适配见 [vendor/SOURCES.json](vendor/SOURCES.json)，下载来源和校验值见 `configs/partcrafter-files.json`、`configs/vision-model.json` 与 `models/manifest.json`。
 
-GitHub Pages 发布可旋转、展开、复位、查看测量来源并下载的示例。生成新图片和保存布尔合并使用本机服务，在页面点击“连接生成服务”即可连接已启动的 `http://127.0.0.1:8765`。浏览器可能要求允许访问本机网络。
+## 公开页面
 
-公开资源由 `scripts/export_gallery.py` 从人工指定的示例目录生成，私有上传目录 `artifacts/runs/` 不进入 Git 或公开站点。GitHub Actions 工作流见 `.github/workflows/pages.yml`。
+GitHub Pages 展示可交互、可下载的公开示例。生成新图片、保存合并或名称需要运行本机服务，并在页面点击“连接生成服务”。浏览器可能要求允许访问本机网络。
 
-当前量子输出确实参与分件和层级决策；实际量子加速与公司真机仍未验证。原型可用、模拟实验和真机加速是分别记录的状态。
+公开资源由 `scripts/export_gallery.py` 的显式清单生成；私有图片和失败调试位于忽略的 `artifacts/runs/`，不打包进公开页面。源码与示例可公开复现，模型权重按固定版本另行下载。
