@@ -1,0 +1,44 @@
+name: Import verified Q-AMG snapshot
+on:
+  workflow_dispatch:
+    inputs:
+      target_commit:
+        description: Exact commit from the audited local Git pack
+        required: true
+      pack_sha256:
+        description: SHA-256 of the concatenated qamg-source.pack.* files
+        required: true
+      file_count:
+        description: Exact number of files in the target commit
+        required: true
+permissions:
+  contents: write
+concurrency:
+  group: qamg-snapshot-import
+  cancel-in-progress: false
+jobs:
+  import:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Verify pack and publish exact audited commit
+        shell: bash
+        env:
+          TARGET_COMMIT: ${{ inputs.target_commit }}
+          PACK_SHA256: ${{ inputs.pack_sha256 }}
+          EXPECTED_FILES: ${{ inputs.file_count }}
+        run: |
+          set -euo pipefail
+          [[ "$TARGET_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$PACK_SHA256" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$EXPECTED_FILES" =~ ^[0-9]+$ ]]
+          cat qamg-source.pack.* > "$RUNNER_TEMP/qamg-source.pack"
+          echo "$PACK_SHA256  $RUNNER_TEMP/qamg-source.pack" | sha256sum --check --strict
+          git unpack-objects < "$RUNNER_TEMP/qamg-source.pack"
+          test "$(git cat-file -t "$TARGET_COMMIT")" = commit
+          test "$(git ls-tree -r --name-only "$TARGET_COMMIT" | wc -l | tr -d ' ')" = "$EXPECTED_FILES"
+          # Workflow files must first be reviewed and committed through the owner session.
+          test -z "$(git diff --name-only "$GITHUB_SHA" "$TARGET_COMMIT" -- .github/workflows)"
+          git push --force-with-lease="refs/heads/main:$GITHUB_SHA" origin "$TARGET_COMMIT:refs/heads/main"
+          echo "Published $TARGET_COMMIT with $EXPECTED_FILES files" >> "$GITHUB_STEP_SUMMARY"
