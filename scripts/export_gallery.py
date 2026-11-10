@@ -6,6 +6,8 @@ import json
 import shutil
 from pathlib import Path
 
+from qamg.gallery import public_catalogue
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -15,7 +17,8 @@ def main():
         shutil.rmtree(target)
     target.mkdir(parents=True, exist_ok=True)
     examples, excluded = [], []
-    for name in ["robot", "drive", "clamp"]:
+    for entry in public_catalogue():
+        name = entry["slug"]
         source = ROOT/"artifacts/examples"/name
         if not (source/"run.json").is_file():
             continue
@@ -36,10 +39,12 @@ def main():
         output = target/id
         output.mkdir(exist_ok=True)
         for file in ["run.json", "structure.json", "trace.json", "assembly.glb", "assembly.step", "assembly.obj",
-                     "parts.zip", "input.png", "disassembly.json", "quality-review.json"]:
+                     "parts.zip", "input.png", "disassembly.json", "quality-review.json", "demo.json", "thumbnail.png"]:
             if (source/file).is_file():
                 shutil.copy2(source/file, output/file)
-        examples.append({"id": id, "kind": summary.get("kind", "parametric_cad"), "part_count": summary["part_count"]})
+        examples.append({"id": id, "title": entry["title"], "category": entry["category"],
+                         "description": entry["description"], "kind": summary.get("kind", "parametric_cad"),
+                         "part_count": summary["part_count"], "thumbnail": "thumbnail.png" if (output/"thumbnail.png").is_file() else None})
     (target/"index.json").write_text(json.dumps({"project": "Q-AMG", "quantum_sdk": "QuantumBridge",
         "examples": examples, "excluded_examples": excluded, "generation_requires_backend": True,
         "hardware_verified": False, "quantum_speedup_verified": False}, indent=2))

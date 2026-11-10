@@ -59,6 +59,14 @@ class ImagePlanningContext(BaseModel):
     source: str = "Generated single-view mesh; hidden geometry and structural segmentation are inferred"
 
 
+class ShowcaseContext(BaseModel):
+    family: Literal["showcase"] = "showcase"
+    example_id: str
+    title: str
+    seed: int = 42
+    source: str = "Authored procedural concept; QB chooses illustrative layout only; not photo inference or official CAD"
+
+
 class Option(BaseModel):
     key: str
     label: str

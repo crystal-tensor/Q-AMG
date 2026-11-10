@@ -355,14 +355,18 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
                   "quantum_resampling_performed": False}
     if provenance.get("quantum_role") == "assembly_explosion_direction_selection":
         provenance["quantum_role"] = "source_assembly_direction_selection"
+    elif provenance.get("quantum_role") == "illustrative_layout_parameter_selection":
+        provenance["quantum_role"] = "source_illustrative_layout_parameter_selection"
     appearance = [p.get("appearance", {}) for p in kept]+[{}]
     export_parts(parts, output, provenance, disassembly, validation, labels, members, appearance=appearance)
-    for filename in ["input.png", "processed.png", "source.glb", "design.json", "problem.json", "trace.json", "container-fit.json"]:
+    for filename in ["input.png", "processed.png", "source.glb", "design.json", "problem.json", "trace.json", "container-fit.json", "demo.json", "thumbnail.png"]:
         if (source_directory/filename).is_file():
             shutil.copy2(source_directory/filename, output/filename)
     edit_s = time.perf_counter()-started
     result = {**summary, "kind": "mesh_edit", "part_count": len(parts), "validation": validation,
               "provenance": provenance, "source_run_id": source_run_id,
+              "disassembly": {"complete_for_generated_mesh": disassembly["complete_for_generated_mesh"],
+                              "moves": len(disassembly["moves"]), "continuous_collision_proof": False},
               "original_run_id": provenance["original_run_id"], "files": {
                   "glb": "assembly.glb", "obj": "assembly.obj", "stl": "assembly.stl", "parts": "parts.zip", "structure": "structure.json"},
               "timings": {**summary["timings"], "latest_merge_s": edit_s,

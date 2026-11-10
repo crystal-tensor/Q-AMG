@@ -78,6 +78,8 @@ uv run --locked python scripts/validate_vision_precision.py --output artifacts/n
 
 ## 公开页面
 
+页头的 **EXAMPLES / REPRODUCIBLE** 收录 10 个新增结构概念与原有 2 个参数化 CAD 示例。新增范围包括航空发动机、飞机、邮轮、Model Y、iPhone、Optimus、猎鹰火箭、机械手表、炼油厂与工业机械臂，详见 [示例来源与复现](docs/showcase-examples.md)。品牌型号为外形参考，内部、比例及部件关系为人工示意，非照片重建或官方 CAD。
+
 GitHub Pages 展示可交互、可下载的公开示例。生成新图片、保存合并或名称需要运行本机服务，并在页面点击“连接生成服务”。浏览器可能要求允许访问本机网络。
 
 公开资源由 `scripts/export_gallery.py` 的显式清单生成；私有图片和失败调试位于忽略的 `artifacts/runs/`，不打包进公开页面。源码与示例可公开复现，模型权重按固定版本另行下载。

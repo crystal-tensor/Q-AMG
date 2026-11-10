@@ -2,7 +2,8 @@
 <html lang="zh-CN">
 <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="icon" href="/favicon.svg"/><title>Q-AMG · Quantum-assisted Mechanical Generation</title></head>
 <body>
-  <header><a class="brand" href="./" title="Quantum-assisted Mechanical Generation">Q<span>-AMG</span><i>Quantum-assisted Mechanical Generation</i></a><div class="header-note">图片到三维 / QB 装配规划 / 拆解与合并</div><button id="connect-api" class="text-button">连接生成服务</button><div id="runtime" class="runtime"><span class="dot"></span>正在检测计算环境</div></header>
+  <header><a class="brand" href="./" title="Quantum-assisted Mechanical Generation">Q<span>-AMG</span><i>Quantum-assisted Mechanical Generation</i></a><div class="header-note">图片到三维 / QB 装配规划 / 拆解与合并</div><button id="examples-toggle" class="examples-toggle" aria-expanded="true" aria-controls="examples-panel">EXAMPLES / REPRODUCIBLE <span id="example-total">12</span><span class="examples-chevron" aria-hidden="true">⌃</span></button><button id="connect-api" class="text-button">连接生成服务</button><div id="runtime" class="runtime"><span class="dot"></span>正在检测计算环境</div></header>
+  <section id="examples-panel" class="examples-panel" aria-label="可复现示例"><div class="examples-intro"><p>选择一个结构，开始探索。<span>10 个结构示意 · 2 个参数化 CAD 示例</span></p><button id="examples-close" class="text-button">收起示例 ↑</button></div><div id="example-grid" class="example-grid"><p class="muted">正在载入示例…</p></div></section>
   <div id="connection-panel" class="connection-panel" hidden><label for="backend-url">生成服务地址</label><input id="backend-url" type="url" value="http://127.0.0.1:8765"/><button id="save-connection" class="secondary">连接</button><span>本地运行 ./scripts/demo.sh 后，可使用本机 GPU / CPU 生成。</span></div>
   <div id="public-notice" class="public-notice" hidden>公开示例可旋转、拆解、复位和下载。生成新模型及保存合并结果，请连接本机生成服务。</div>
   <div class="workspace">
@@ -26,8 +27,7 @@
       </div>
       <label for="encoding">量子结构编码</label><select id="encoding"><option value="compact_binary">紧凑二进制 · 每组 1 比特</option><option value="onehot">独热编码 · 每组 2 比特</option></select>
       <label for="backend">计算后端</label><select id="backend"><option value="auto">QB · 本机 GPU 优先 / CPU</option><option value="qb">QB 原生 CPU · 理想模拟</option><option value="qb-noisy">QB 原生 CPU · 参考噪声</option><option value="classical">经典求解 · 对照</option><option value="company">公司超导 QPU · 需配置</option></select>
-      <button id="generate" class="primary"><span id="generate-label">从图片生成 3D</span><span aria-hidden="true">↗</span></button><div id="job-status" role="status" aria-live="polite" class="job-status">上传图片，或先探索下方示例。</div>
-      <div class="divider"></div><div class="eyebrow">EXAMPLES / REPRODUCIBLE</div><div class="example-buttons"><button data-example="example-robot" id="robot-example" hidden>图片 → 玩具机器人 <span>↗</span></button><button data-example="example-drive">轴 / 轴承 / 齿轮 <span>↗</span></button><button data-example="example-clamp">夹持机构 <span>↗</span></button></div>
+      <button id="generate" class="primary"><span id="generate-label">从图片生成 3D</span><span aria-hidden="true">↗</span></button><div id="job-status" role="status" aria-live="polite" class="job-status">上传图片，或先探索顶部示例。</div>
       <div class="scope-note">量子部分使用 QuantumBridge 原生电路与编译。当前本机 GPU / CPU 执行模拟，真机加速尚待验证。</div>
     </aside>
     <main>
@@ -40,6 +40,7 @@
       <div id="part-label-editor" class="assembly-actions" hidden><label for="part-label-input">部件名称</label><input id="part-label-input" type="text" maxlength="64"/><button id="save-part-label" class="secondary">保存名称</button><span class="small-note">选择一件，逐件核对并命名</span></div>
       <div id="container-fit-panel" class="assembly-actions" hidden><button id="container-fit" class="secondary">杯类结构辅助重建</button><span class="small-note">限定盖子 / 杯子 / 杯套；适用于近似旋转体，内壁与间隙为假设。</span></div>
       <div id="source-reference" class="source-reference" hidden><img id="source-image" alt="生成所依据的二维图片"/><div><div class="eyebrow">SOURCE / SINGLE VIEW</div><strong>保留输入，核对生成。</strong><p id="image-scope">背面和不可见结构由模型推测；分件位置可调整，真实装配关系待确认。</p></div></div>
+      <div id="demo-reference" class="source-reference" hidden><img id="demo-image" alt="示例模型的三维缩略图"/><div><div class="eyebrow">AUTHORED / STRUCTURAL CONCEPT</div><strong>结构示意，可逐件探索。</strong><p id="demo-scope"></p><a id="demo-reference-link" target="_blank" rel="noopener noreferrer">品牌参考入口 ↗</a></div></div>
       <section class="evidence"><div><div class="eyebrow">03 / MEASURED DECISIONS</div><h3>每个结构决策，都有来源。</h3><div id="decisions" class="decisions"><p class="muted">这里将显示测量结果与零件决策的对应关系。</p></div></div><div class="trace-card"><div class="trace-title">被选中的结构编码 <span id="source-tag">尚无记录</span></div><code id="selected-bits">—</code><div id="trace-note" class="muted">量子模拟与真机实测将明确区分。</div><button id="toggle-trace" class="text-button">查看测量记录 ↗</button></div></section>
       <div id="trace-panel" class="trace-panel" hidden></div>
       <div class="downloads"><span>保留结构，继续设计。</span><a id="download-step" aria-disabled="true">STEP 实体 ↗</a><a id="download-glb" aria-disabled="true">GLB 模型 ↗</a><a id="download-json" aria-disabled="true">结构与参数 ↗</a><a id="download-parts" aria-disabled="true" hidden>分件文件 ZIP ↗</a></div>

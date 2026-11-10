@@ -17,9 +17,26 @@ const viewport=$('viewport'),scene=new THREE.Scene(),camera=new THREE.Perspectiv
 camera.up.set(0,0,1);
 let renderer,controls,floorGrid;
 
+function showExamples(open){$('examples-panel').hidden=!open;$('examples-toggle').setAttribute('aria-expanded',String(open));}
+$('examples-toggle').addEventListener('click',()=>showExamples($('examples-panel').hidden));
+$('examples-close').addEventListener('click',()=>showExamples(false));
+function renderExamples(){
+  $('example-total').textContent=staticRuns.size;$('example-grid').replaceChildren();
+  for(const entry of staticRuns.values()){
+    const button=document.createElement('button');button.type='button';button.className='example-card';button.dataset.example=entry.id;button.setAttribute('aria-pressed',String(entry.id===currentRun));
+    const image=document.createElement('img');image.src=`${BASE}gallery/${entry.id}/${entry.thumbnail||'thumbnail.png'}`;image.alt='';image.loading='lazy';
+    const meta=document.createElement('span');meta.className='example-meta';meta.textContent=`${entry.category} / ${entry.part_count} 件`;
+    const name=document.createElement('strong');name.textContent=entry.title;
+    const detail=document.createElement('span');detail.className='example-detail';detail.textContent=entry.kind==='procedural_demo'?'结构示意 · 可拆合':'参数化机械 · STEP';
+    button.append(image,meta,name,detail);$('example-grid').appendChild(button);
+  }
+}
+async function prepareGallery(){const data=await json(BASE+'gallery/index.json');for(const entry of data.examples)staticRuns.set(entry.id,entry);renderExamples();}
+
 function status(message,error=false){$('job-status').textContent=message;$('job-status').classList.toggle('error',error);}
 function generationBusy(value){busy=value;$('generate').disabled=value;$('image-file').disabled=value;$('container-fit').disabled=value;document.querySelectorAll('[data-example],[data-mode]').forEach(button=>button.disabled=value);}
 function clearRun(message='正在生成当前输入的模型…'){
+  status(message);
   loadingVersion++;reassemble();
   if(model){scene.remove(model);model.traverse(n=>{if(n.isMesh){n.geometry.dispose();for(const material of Array.isArray(n.material)?n.material:[n.material])material.dispose();}});}
   model=undefined;structure=undefined;currentRun=undefined;currentSummary=undefined;meshes.clear();selected.clear();isolateSelected=false;
@@ -27,6 +44,7 @@ function clearRun(message='正在生成当前输入的模型…'){
   for(const id of ['part-count','qubits','shots','duration','selected-bits'])$(id).textContent='—';
   $('validation-tag').textContent='尚无当前输入的结果';$('validation-tag').classList.remove('valid');
   $('source-reference').hidden=true;$('source-tag').textContent='等待本次结果';$('trace-note').textContent='本次生成完成后显示测量记录。';
+  $('demo-reference').hidden=true;
   $('decisions').replaceChildren();$('trace-panel').replaceChildren();$('trace-panel').hidden=true;
   $('disassemble').disabled=true;$('restore-parts').disabled=true;
   $('container-fit-panel').hidden=true;
@@ -58,13 +76,15 @@ function updateSelection(){
 }
 function selectPart(id,toggle=false){if(!toggle)selected.clear();if(toggle&&selected.has(id))selected.delete(id);else selected.add(id);updateSelection();if(isolateSelected)resetCamera();}
 function setExplosion(value){if(!structure)return;for(const part of structure.parts){const object=meshes.get(part.id);if(object)object.position.copy(object.userData.originalPosition).addScaledVector(new THREE.Vector3(...part.explode_mm),value/1000);}}
-function reassemble(){animated=false;disassembling=false;$('explode').value=0;setExplosion(0);$('animate').textContent='▷ 示意爆炸动画';$('disassemble').textContent='▷ 采样核验拆解';}
+function sampledLabel(replay=false){const sequence=structure?.disassembly,partial=sequence?.complete_for_generated_mesh===false&&structure?.representation==='generated_mesh_parts';return `${replay?'↺':'▷'} ${partial?`部分采样拆解 (${sequence.moves.length}/${Math.max(1,structure.parts.length-1)})`:replay?'重播采样核验拆解':'采样核验拆解'}`;}
+function reassemble(){animated=false;disassembling=false;$('explode').value=0;setExplosion(0);$('animate').textContent='▷ 示意爆炸动画';$('disassemble').textContent=sampledLabel();}
 function fitCamera(includeExploded=false){
   if(!model||!controls)return;
   const bounds=new THREE.Box3();if(isolateSelected){for(const id of selected){const object=meshes.get(id);if(object)bounds.union(new THREE.Box3().setFromObject(object));}}else bounds.setFromObject(model);const extent=Math.max(.001,bounds.getSize(new THREE.Vector3()).length());
   if(includeExploded&&structure){for(const part of structure.parts){const object=meshes.get(part.id);if(object&&(!isolateSelected||selected.has(part.id)))bounds.union(new THREE.Box3().setFromObject(object).translate(new THREE.Vector3(...part.explode_mm).multiplyScalar(.001)));}}
   const target=bounds.getCenter(new THREE.Vector3()),span=Math.max(extent,bounds.getSize(new THREE.Vector3()).length());
-  controls.target.copy(target);camera.position.copy(target).add(new THREE.Vector3(1.05,1.45,1.1).multiplyScalar(span*1.15));camera.near=Math.max(.0001,span/100);camera.far=Math.max(5,span*30);camera.updateProjectionMatrix();if(floorGrid)floorGrid.position.z=bounds.min.z-span*.03;controls.update();
+  const vertical=THREE.MathUtils.degToRad(camera.fov)/2,horizontal=Math.atan(Math.tan(vertical)*camera.aspect),distance=span*.53/Math.sin(Math.min(vertical,horizontal));
+  controls.target.copy(target);camera.position.copy(target).addScaledVector(new THREE.Vector3(1.05,1.45,1.1).normalize(),distance);camera.near=Math.max(.0001,span/100);camera.far=Math.max(5,span*30);camera.updateProjectionMatrix();if(floorGrid)floorGrid.position.z=bounds.min.z-span*.03;controls.update();
 }
 function resetCamera(){reassemble();fitCamera();}
 try{
@@ -74,7 +94,7 @@ try{
   floorGrid=new THREE.GridHelper(.5,25,0xcad5c7,0xe1e7db);floorGrid.rotation.x=Math.PI/2;floorGrid.material.transparent=true;floorGrid.material.opacity=.5;scene.add(floorGrid);
   new ResizeObserver(()=>{const w=viewport.clientWidth,h=viewport.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}).observe(viewport);
   const raycaster=new THREE.Raycaster();renderer.domElement.addEventListener('click',event=>{const r=renderer.domElement.getBoundingClientRect();raycaster.setFromCamera(new THREE.Vector2((event.clientX-r.left)/r.width*2-1,-(event.clientY-r.top)/r.height*2+1),camera);const hit=raycaster.intersectObjects([...meshes.values()],true)[0];if(hit){let object=hit.object;while(object&&!meshes.has(object.name))object=object.parent;if(object)selectPart(object.name,event.shiftKey);}});
-  function frame(t){requestAnimationFrame(frame);if(animated){const v=(1-Math.cos((t-animationStart)/2200))/2;$('explode').value=Math.round(v*100);setExplosion(v);}if(disassembling&&structure?.disassembly){const moves=structure.disassembly.moves,progress=(t-animationStart)/1200;for(let i=0;i<moves.length;i++){const object=meshes.get(moves[i].part);if(object)object.position.copy(object.userData.originalPosition).addScaledVector(new THREE.Vector3(...moves[i].translation_mm),Math.min(1,Math.max(0,progress-i))/1000);}if(progress>=moves.length){disassembling=false;$('disassemble').textContent='↺ 重播采样核验拆解';}}controls.update();renderer.render(scene,camera);}requestAnimationFrame(frame);
+  function frame(t){requestAnimationFrame(frame);if(animated){const v=(1-Math.cos((t-animationStart)/2200))/2;$('explode').value=Math.round(v*100);setExplosion(v);}if(disassembling&&structure?.disassembly){const moves=structure.disassembly.moves,progress=(t-animationStart)/1200;for(let i=0;i<moves.length;i++){const object=meshes.get(moves[i].part);if(object)object.position.copy(object.userData.originalPosition).addScaledVector(new THREE.Vector3(...moves[i].translation_mm),Math.min(1,Math.max(0,progress-i))/1000);}if(progress>=moves.length){disassembling=false;$('disassemble').textContent=sampledLabel(true);}}controls.update();renderer.render(scene,camera);}requestAnimationFrame(frame);
 }catch(error){$('empty').textContent='当前浏览器无法启用 3D 渲染，仍可生成与下载。';console.error(error);}
 $('reset-camera').addEventListener('click',resetCamera);$('reassemble').addEventListener('click',()=>{reassemble();fitCamera();});
 $('isolate-parts').addEventListener('click',()=>{isolateSelected=!isolateSelected;updateSelection();resetCamera();});
@@ -94,28 +114,31 @@ async function loadRun(id){
   const version=++loadingVersion,base=runBase(id),[summary,data,trace]=await Promise.all([json(base+'run.json'),json(base+'structure.json'),json(base+'trace.json')]);if(version!==loadingVersion)return;
   if(summary.quality_review?.accepted===false)throw new Error(`此结果未通过部件核对：${summary.quality_review.reason}`);
   currentRun=id;currentSummary=summary;structure=data;selected.clear();reassemble();
-  const imageDerived=summary.spec.family==='image_parts',meshOnly=data.representation==='generated_mesh_parts',planner=summary.settings.planner||summary.settings;setMode(imageDerived?'image':'param');
+  const imageDerived=summary.spec.family==='image_parts',showcase=summary.spec.family==='showcase',meshOnly=data.representation==='generated_mesh_parts',planner=summary.settings.planner||summary.settings;setMode(imageDerived||showcase?'image':'param');
   if(imageDerived){$('image-parts').value=summary.settings.desired_parts;$('image-size').value=summary.settings.size_mm;$('image-resolution').value=summary.settings.resolution;$('image-seed').value=summary.settings.seed;$('remove-background').checked=summary.settings.remove_background;}
-  else{chooseFamily(summary.spec.family);$('load').value=summary.spec.load;$('groups').value=summary.spec.groups;$('seed').value=summary.spec.seed;$('size').value=family==='drive'?summary.spec.shaft_length_mm:summary.spec.opening_mm;$('intent').value=summary.spec.source_text||'';}
+  else if(!showcase){chooseFamily(summary.spec.family);$('load').value=summary.spec.load;$('groups').value=summary.spec.groups;$('seed').value=summary.spec.seed;$('size').value=family==='drive'?summary.spec.shaft_length_mm:summary.spec.opening_mm;$('intent').value=summary.spec.source_text||'';}
   $('backend').value=[...$('backend').options].some(o=>o.value===planner.backend)?planner.backend:'auto';$('encoding').value=planner.encoding||'compact_binary';
-  $('model-title').textContent=imageDerived?`${id.startsWith('example-')?'示例 · ':''}${summary.source_name||'图像生成结果'}`:family==='drive'?'轴、轴承与齿轮的结构协作。':'让夹持与导向各得其位。';$('representation-label').textContent=meshOnly?'3D / GENERATED MESH PARTS':'CAD / PARAMETRIC B-REP';
+  $('model-title').textContent=showcase?`${summary.title} · 结构示意`:imageDerived?`${id.startsWith('example-')?'示例 · ':''}${summary.source_name||'图像生成结果'}`:family==='drive'?'轴、轴承与齿轮的结构协作。':'让夹持与导向各得其位。';$('representation-label').textContent=showcase?'3D / AUTHORED STRUCTURAL CONCEPT':meshOnly?'3D / GENERATED MESH PARTS':'CAD / PARAMETRIC B-REP';
   $('part-count').textContent=summary.part_count;$('qubits').textContent=summary.resources.peak_logical_qubits??summary.resources.logical_qubits??'经典';$('shots').textContent=(summary.resources.total_shots??summary.resources.shots)?.toLocaleString()??'—';$('duration').textContent=summary.timings.end_to_end_s.toFixed(2)+' s';
-  $('validation-tag').textContent=summary.validation.valid?(meshOnly?'● 网格有效 · 结构待核验':'● 几何校验通过'):'校验未通过';$('validation-tag').classList.toggle('valid',summary.validation.valid);$('selected-bits').textContent=summary.selected_bits;
+  $('validation-tag').textContent=summary.validation.valid?(showcase?'● 示意实体有效':meshOnly?'● 网格有效 · 结构待核验':'● 几何校验通过'):'校验未通过';$('validation-tag').classList.toggle('valid',summary.validation.valid);$('selected-bits').textContent=summary.selected_bits;
   const source=summary.provenance.execution_source;$('source-tag').textContent=source==='classical_cpu'?'经典对照':source.includes('simulator')?'QB 模拟测量':'远端后端';
   const device=trace.flatMap(r=>r.plan?.trace||[]).findLast(b=>b.metadata?.device)?.metadata.device,label=device==='mps'?'Apple GPU / MPS':device==='cuda'?'CUDA GPU':device||'CPU';if(apiAvailable)$('runtime').textContent=`QB · ${source==='classical_cpu'?'经典 CPU':label}`;
   const compact=summary.resources.encoding==='compact_binary',physical=compact?summary.selected_bits.match(/../g).map(p=>p[1]).join(''):summary.selected_bits;
   $('trace-note').textContent=`${summary.provenance.selected_measurement?.kind==='conditioned_composite'?'分块条件测量组成结构 · ':compact?'测量 '+physical+' → 结构编码 · ':''}${summary.provenance.generation_rounds} 轮生成 · ${summary.provenance.fallback_used?'发生经典回退':'未发生经典回退'}${summary.kind==='mesh_edit'?' · 合并沿用原分件测量':''}`;
-  $('disassemble').disabled=!data.disassembly?.moves?.length||data.parts.length<2;$('disassemble').textContent='▷ 采样核验拆解';$('restore-parts').disabled=!summary.original_run_id;
+  $('disassemble').disabled=!data.disassembly?.moves?.length||data.parts.length<2;$('disassemble').textContent=sampledLabel();$('restore-parts').disabled=!summary.original_run_id;
   $('container-fit-panel').hidden=!imageDerived;
+  $('demo-reference').hidden=!showcase;if(showcase){$('demo-image').src=base+'thumbnail.png';const sequence=data.disassembly,partial=sequence?.complete_for_generated_mesh===false?`当前方向有 ${sequence.moves.length}/${data.parts.length-1} 步通过离散核对，可用示意爆炸查看全部部件。`:'';$('demo-scope').textContent=`${summary.description}。人工参数化结构示意，非照片重建或官方 CAD；内部、比例及部件关系未经原产品核验。${partial}`;if(partial)$('disassemble').textContent=`▷ 部分采样拆解 (${sequence.moves.length}/${data.parts.length-1})`;const link=$('demo-reference-link');link.hidden=!summary.demo?.reference;if(summary.demo?.reference)link.href=summary.demo.reference;}
   $('source-reference').hidden=!imageDerived;if(imageDerived){$('source-image').src=base+'input.png';const scope=summary.provenance.structure_prior==='explicit_lid_cup_sleeve'?'按盖子、杯子、杯套的显式结构约束辅助拟合；盖子提片为形状近似，连续空心杯体、壁厚、间隙及透明显示均含假设；':summary.provenance.geometric_slicing_performed===false?'独立部件由神经模型联合生成，按部件配色；':'历史几何切片结果，不代表真实部件识别；';const overlap=summary.validation.generated_part_overlap_fraction||0,moves=data.disassembly?.moves?.length||0;const concerns=`${overlap>1e-5?'部件交叠约 '+(100*overlap).toFixed(1)+'%；':''}${data.disassembly?.complete_for_generated_mesh===false?'仅 '+moves+'/'+Math.max(0,data.parts.length-1)+' 步通过当前方向的离散拆解检查；':''}`;$('image-scope').textContent=`${summary.model.model} · 标尺 ${summary.settings.size_mm} mm。${scope}${concerns}背面、内部与真实连接需核验。`;}
   $('decisions').replaceChildren();for(const[key,value]of Object.entries(summary.decisions)){const chip=document.createElement('div');chip.className='decision';const name=document.createElement('small');name.textContent=key;chip.append(name,document.createTextNode(value.label));$('decisions').appendChild(chip);}
   $('trace-panel').replaceChildren();for(const round of trace){const title=document.createElement('div');title.textContent=`ROUND ${round.round+1} · ${round.plan.execution_source}`;$('trace-panel').appendChild(title);const counts={};for(const batch of round.plan.trace)for(const[bits,n]of Object.entries(batch.counts||{}))counts[bits]=(counts[bits]||0)+n;for(const[bits,count]of Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10)){const div=document.createElement('div');div.textContent=`${bits} × ${count}${bits===summary.selected_bits?' ← selected':''}`;$('trace-panel').appendChild(div);}}
   renderTree();for(const[element,file]of [['download-step',meshOnly?'assembly.obj':'assembly.step'],['download-glb','assembly.glb'],['download-json','structure.json'],['download-parts','parts.zip']]){$(element).href=base+file;$(element).setAttribute('aria-disabled','false');$(element).download=file;}$('download-step').textContent=meshOnly?'OBJ 网格 ↗':'STEP 实体 ↗';$('download-parts').hidden=!meshOnly;
   if(renderer){const gltf=await new GLTFLoader().loadAsync(base+'assembly.glb');if(version!==loadingVersion)return;if(model){scene.remove(model);model.traverse(n=>{if(n.isMesh){n.geometry.dispose();for(const m of Array.isArray(n.material)?n.material:[n.material])m.dispose();}});}meshes.clear();model=gltf.scene;scene.add(model);for(const part of data.parts){const object=model.getObjectByName(part.id);if(object){object.userData.originalPosition=object.position.clone();meshes.set(part.id,object);}}$('empty').hidden=true;resetCamera();}
-  status(`${summary.part_count} 个${imageDerived?'候选分件':'独立零件'}已载入，可拆解、重新装配或选择合并。`);
+  document.querySelectorAll('[data-example]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.example===id)));
+  if(staticRuns.has(id)){const url=new URL(location.href);url.searchParams.set('run',id);history.replaceState(null,'',url);}
+  status(`${summary.part_count} 个${showcase?'示意部件':imageDerived?'候选分件':'独立零件'}已载入，可拆解、重新装配或选择合并。`);
 }
 $('toggle-trace').addEventListener('click',()=>{$('trace-panel').hidden=!$('trace-panel').hidden;});
-document.querySelectorAll('[data-example]').forEach(b=>b.addEventListener('click',()=>loadRun(b.dataset.example).catch(e=>status(e.message,true))));
+$('example-grid').addEventListener('click',event=>{const button=event.target.closest('[data-example]');if(!button||busy)return;showExamples(false);loadRun(button.dataset.example).catch(e=>status(e.message,true));});
 $('image-file').addEventListener('change',()=>{if(previewURL)URL.revokeObjectURL(previewURL);const file=$('image-file').files[0];$('image-preview').hidden=!file;if(file){clearRun('已选择新图片，请生成后查看对应三维结果。');previewURL=URL.createObjectURL(file);$('image-preview').src=previewURL;status(`已选择 ${file.name}，可生成三维外观与候选分件。`);}});
 const dropZone=document.querySelector('.upload-label');
 dropZone.addEventListener('dragover',event=>event.preventDefault());
@@ -134,9 +157,9 @@ $('restore-parts').addEventListener('click',()=>{if(currentSummary?.original_run
 $('save-part-label').addEventListener('click',async()=>{if(!requireAPI()||selected.size!==1)return;const id=[...selected][0],label=$('part-label-input').value.trim();if(!label){status('请输入部件名称。',true);return;}generationBusy(true);updateSelection();try{const job=await json(`/api/runs/${currentRun}/labels`,{method:'POST',body:JSON.stringify({labels:{[id]:label}})});await waitJob(job);}catch(e){status(e.message,true);}finally{generationBusy(false);updateSelection();}});
 $('container-fit').addEventListener('click',async()=>{if(!requireAPI()||!currentRun)return;generationBusy(true);try{status('按盖子、杯子、杯套约束拟合，保留原始参考…');const job=await json(`/api/runs/${currentRun}/container-fit`,{method:'POST'});await waitJob(job);}catch(e){status(e.message,true);}finally{generationBusy(false);updateSelection();}});
 async function refreshModel(){if(!apiAvailable)return;try{const data=await json('/api/image-model');modelReady=data.ready;$('image-model-status').textContent=data.ready?`${data.model} 已准备 · 联合生成独立部件`:`部件模型准备中 · ${(100*data.downloaded_bytes/data.checkpoint_bytes).toFixed(1)}% 权重已下载`;}catch{modelReady=false;}}
-async function connect(){const url=new URL($('backend-url').value);if(!['http:','https:'].includes(url.protocol))throw new Error('请输入 http 或 https 服务地址');apiOrigin=url.href.replace(/\/$/,'');const info=await json('/api/status');apiAvailable=true;$('public-notice').hidden=true;$('connection-panel').hidden=true;try{localStorage.setItem('qamg-api',apiOrigin);}catch{}$('runtime').textContent=`QB 本地模拟 · ${info.runtime.selected_simulator_device}`;await refreshModel();const runs=await json('/api/runs');$('robot-example').hidden=!runs.some(r=>r.id==='example-robot');return runs;}
+async function connect(){const url=new URL($('backend-url').value);if(!['http:','https:'].includes(url.protocol))throw new Error('请输入 http 或 https 服务地址');apiOrigin=url.href.replace(/\/$/,'');const info=await json('/api/status');apiAvailable=true;$('public-notice').hidden=true;$('connection-panel').hidden=true;try{localStorage.setItem('qamg-api',apiOrigin);}catch{}$('runtime').textContent=`QB 本地模拟 · ${info.runtime.selected_simulator_device}`;await refreshModel();return await json('/api/runs');}
 $('connect-api').addEventListener('click',()=>{$('connection-panel').hidden=!$('connection-panel').hidden;});
 $('save-connection').addEventListener('click',async()=>{try{await connect();status('生成服务已连接，请选择图片或示例。');}catch(e){apiAvailable=false;status(`连接失败：${e.message}`,true);}});
-async function staticGallery(){ $('public-notice').hidden=false;$('runtime').textContent='QB 生成示例 · 在线预览';$('image-model-status').textContent='生成新模型需要连接本机 GPU / CPU 服务';const data=await json(BASE+'gallery/index.json');for(const run of data.examples)staticRuns.set(run.id,run);$('robot-example').hidden=!staticRuns.has('example-robot');if(data.examples.length)await loadRun(staticRuns.has(requestedRun)?requestedRun:data.examples[0].id);}
-try{if(localPage){try{await connect();if(requestedRun)await loadRun(requestedRun);}catch(e){if(requestedRun)throw e;await staticGallery();}}else await staticGallery();}catch(e){status(e.message,true);}
+async function staticGallery(){ $('public-notice').hidden=false;$('runtime').textContent='QB 生成示例 · 在线预览';$('image-model-status').textContent='生成新模型需要连接本机 GPU / CPU 服务';if(staticRuns.size)await loadRun(staticRuns.has(requestedRun)?requestedRun:[...staticRuns.keys()][0]);}
+try{await prepareGallery();if(requestedRun)showExamples(false);if(localPage){try{await connect();if(requestedRun)await loadRun(requestedRun);else if(staticRuns.size)await loadRun([...staticRuns.keys()][0]);}catch(e){if(requestedRun)throw e;await staticGallery();}}else await staticGallery();}catch(e){status(e.message,true);}
 setInterval(refreshModel,10000);

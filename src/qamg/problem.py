@@ -11,7 +11,15 @@ from itertools import product
 
 import numpy as np
 
-from .schema import ChoiceGroup, DesignSpec, ImagePlanningContext, Option, PairRule, UnaryRule
+from .schema import (
+    ChoiceGroup,
+    DesignSpec,
+    ImagePlanningContext,
+    Option,
+    PairRule,
+    ShowcaseContext,
+    UnaryRule,
+)
 
 
 @dataclass
@@ -85,7 +93,7 @@ class Qubo:
 
 @dataclass
 class StructureProblem:
-    spec: DesignSpec | ImagePlanningContext
+    spec: DesignSpec | ImagePlanningContext | ShowcaseContext
     groups: list[ChoiceGroup]
     pairs: list[PairRule] = field(default_factory=list)
     unary: list[UnaryRule] = field(default_factory=list)
