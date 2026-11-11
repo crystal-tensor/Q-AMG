@@ -39,12 +39,15 @@ def main():
         output = target/id
         output.mkdir(exist_ok=True)
         for file in ["run.json", "structure.json", "trace.json", "assembly.glb", "assembly.step", "assembly.obj",
-                     "parts.zip", "input.png", "disassembly.json", "quality-review.json", "demo.json", "thumbnail.png"]:
+                     "parts.zip", "input.png", "disassembly.json", "quality-review.json", "demo.json", "thumbnail.png",
+                     "bom.json", "bom.csv", "references.json", "reference-photo.png", "photo-attribution.json"]:
             if (source/file).is_file():
                 shutil.copy2(source/file, output/file)
         examples.append({"id": id, "title": entry["title"], "category": entry["category"],
                          "description": entry["description"], "kind": summary.get("kind", "parametric_cad"),
-                         "part_count": summary["part_count"], "thumbnail": "thumbnail.png" if (output/"thumbnail.png").is_file() else None})
+                         "part_count": summary["part_count"], "decomposition": summary.get("decomposition"),
+                         "photo": summary.get("demo", {}).get("photo"),
+                         "thumbnail": "thumbnail.png" if (output/"thumbnail.png").is_file() else None})
     (target/"index.json").write_text(json.dumps({"project": "Q-AMG", "quantum_sdk": "QuantumBridge",
         "examples": examples, "excluded_examples": excluded, "generation_requires_backend": True,
         "hardware_verified": False, "quantum_speedup_verified": False}, indent=2))

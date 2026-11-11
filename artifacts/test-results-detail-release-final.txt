@@ -1,0 +1,46 @@
+..............................................................F......... [ 98%]
+.                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_reference_models_resolve_internal_components_and_hierarchy[model-y-required3] _
+
+slug = 'model-y', required = ['前右制动盘', '后左制动卡钳', '前左减振活塞杆', '前右悬架螺旋弹簧']
+
+    @pytest.mark.parametrize(("slug", "required"), [
+        ("aero-engine", ["风扇叶片 01", "第 1 级静子导叶 01", "低压内轴", "高压空心外轴", "外火焰筒"]),
+        ("airliner", ["机身环形隔框 01", "左翼前翼梁", "右翼肋 01", "方向舵"]),
+        ("luxury-liner", ["水密舱壁 1", "同步发电机 1", "左舷推进轴", "右舷螺旋桨叶片 1"]),
+        ("model-y", ["前右制动盘", "后左制动卡钳", "前左减振活塞杆", "前右悬架螺旋弹簧"]),
+        ("iphone", ["TrueDepth 相机总成", "Taptic Engine", "USB-C 连接器模组", "主麦克风"]),
+        ("optimus", ["右食指第 1 指骨", "左拇指第 2 指骨", "右膝定子绕组", "左踝编码器码盘"]),
+        ("falcon", ["Merlin 09 喷管", "MVac 真空喷管", "一级液氧贯穿输送管", "二级共底"]),
+        ("mechanical-watch", ["主发条", "擒纵叉 · 通用拓扑", "游丝 · 曲线近似", "自动上链摆陀", "日历环 · 刻字不独立计件"]),
+        ("refinery", ["常压蒸馏塔取样筛板塔盘 01", "换热器 1 取样传热管 01", "泵 1 机械密封"]),
+        ("industrial-arm", ["J1 基座回转 · 柔轮", "J6 工具回转 · 波发生器", "J3 肘关节 · 编码器码盘", "同步传动齿轮"]),
+    ])
+    def test_reference_models_resolve_internal_components_and_hierarchy(slug, required):
+        model = BUILDERS[slug]()
+        labels = {part.label for part in model.parts}
+        assert labels >= set(required)
+        assert len(model.parts) >= 45
+        for part in model.parts:
+            assert part.solid.volume() > 0 and not part.solid.is_empty()
+            # Closed internal cavities have negative signed volume. Count only
+            # substantial positive solids, so a hollow casing is accepted while
+            # disconnected teeth or welded-frame islands are rejected.
+            positive = [piece for piece in part.solid.decompose()
+                        if piece.volume() > max(1e-8, part.solid.volume()*1e-6)]
+>           assert len(positive) == 1, part.label
+E           AssertionError: 车身焊接结构参考件
+E           assert 2 == 1
+E            +  where 2 = len([<manifold3d.Manifold object at 0x70022ecbc0>, <manifold3d.Manifold object at 0x7002371480>])
+
+tests/test_showcase.py:108: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/avalok/work/机械拆解/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_showcase.py::test_reference_models_resolve_internal_components_and_hierarchy[model-y-required3]
+1 failed, 72 passed, 1 warning in 31.65s

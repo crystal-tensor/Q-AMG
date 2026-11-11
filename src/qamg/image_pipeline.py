@@ -16,6 +16,7 @@ from .assembly_plan import direction_problem, selected_disassembly, selected_vec
 from .backends import make_backend
 from .benchmark import dump
 from .classical import solve_classical
+from .component_manifest import write_component_manifest
 from .image_model import generate_mesh, read_image
 from .mesh_parts import (
     as_manifold,
@@ -316,6 +317,8 @@ def rename_run(source_directory: Path, labels: dict[str, str], output: Path,
     result = {**summary, "kind": "mesh_annotation", "source_run_id": source_run_id,
               "original_run_id": provenance["original_run_id"], "provenance": provenance}
     dump(output/"structure.json", structure)
+    if "references" in structure:
+        write_component_manifest(output, structure, structure["references"])
     dump(output/"run.json", result)
     dump(output/"annotation.json", {"source_run_id": source_run_id, "changes": changes,
                                    "geometry_modified": False, "quantum_resampling_performed": False})
@@ -358,8 +361,32 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
     elif provenance.get("quantum_role") == "illustrative_layout_parameter_selection":
         provenance["quantum_role"] = "source_illustrative_layout_parameter_selection"
     appearance = [p.get("appearance", {}) for p in kept]+[{}]
-    export_parts(parts, output, provenance, disassembly, validation, labels, members, appearance=appearance)
-    for filename in ["input.png", "processed.png", "source.glb", "design.json", "problem.json", "trace.json", "container-fit.json", "demo.json", "thumbnail.png"]:
+    edited = export_parts(parts, output, provenance, disassembly, validation, labels, members, appearance=appearance)
+    if "decomposition" in structure:
+        for record, original in zip(edited["parts"][:-1], kept, strict=True):
+            for key in ["parent", "assembly_path", "role", "material", "component_basis", "source_refs",
+                        "geometry_accuracy", "is_cover", "explode_mm", "explode_levels_mm"]:
+                if key in original:
+                    record[key] = original[key]
+        edited["groups"] = [g for g in structure["groups"] if g["id"] != "edited-components"]
+        edited["groups"].append({"id": "edited-components", "parent": "root", "label": "编辑组合", "depth": 1})
+        edited["parts"][-1].update({"parent": "edited-components", "assembly_path": "编辑组合",
+                                    "role": "user_merged_components", "component_basis": "geometry_edit"})
+        for key in ["references", "engineering_scope", "decomposition"]:
+            edited[key] = structure[key]
+        active = {p["parent"] for p in edited["parts"]}
+        for group in reversed(edited["groups"]):
+            if group["id"] in active:
+                active.add(group["parent"])
+        edited["groups"] = [g for g in edited["groups"] if g["id"] in active]
+        edited["decomposition"] = {**edited["decomposition"], "counts": {
+            **edited["decomposition"]["counts"], "components": len(parts),
+            "assemblies": sum(g["parent"] == "root" for g in edited["groups"]),
+            "subassemblies": sum(g["parent"] != "root" for g in edited["groups"]),
+            "fasteners": sum(p.get("role") == "fastener" for p in edited["parts"])}}
+        dump(output/"structure.json", edited)
+        write_component_manifest(output, edited, edited["references"])
+    for filename in ["input.png", "processed.png", "source.glb", "design.json", "problem.json", "trace.json", "container-fit.json", "demo.json", "thumbnail.png", "reference-photo.png", "photo-attribution.json"]:
         if (source_directory/filename).is_file():
             shutil.copy2(source_directory/filename, output/filename)
     edit_s = time.perf_counter()-started
@@ -371,6 +398,8 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
                   "glb": "assembly.glb", "obj": "assembly.obj", "stl": "assembly.stl", "parts": "parts.zip", "structure": "structure.json"},
               "timings": {**summary["timings"], "latest_merge_s": edit_s,
                           "end_to_end_s": summary["timings"]["end_to_end_s"]+edit_s}}
+    if "decomposition" in edited:
+        result["decomposition"] = edited["decomposition"]
     dump(output/"merge.json", {"source_run_id": source_run_id, "selected_ids": selected_ids,
                                "validation": validation, "edit_s": edit_s,
                                "quantum_resampling_performed": False})

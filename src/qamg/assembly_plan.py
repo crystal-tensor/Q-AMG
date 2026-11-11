@@ -95,9 +95,14 @@ def selected_disassembly(parts, ids: list[str], vectors: list[list[float]], anch
             if np.linalg.norm(delta) < 1e-7:
                 continue
             clear = True
+            others = np.asarray(sorted(remaining-{i}))
             for t in np.linspace(1/samples, 1, samples):
-                for j in remaining-{i}:
-                    checks += 1
+                # Broad phase in one array operation: dense reference assemblies
+                # otherwise spend most of their time testing distant tiny parts.
+                shifted = bounds[i]+delta*t
+                overlap = np.minimum(shifted[1], bounds[others, 1])-np.maximum(shifted[0], bounds[others, 0])
+                checks += len(others)
+                for j in others[np.all(overlap > 1e-7, axis=1)]:
                     if _overlap(parts[i], parts[j], bounds[i], bounds[j], delta*t) > tolerance:
                         clear = False
                         break

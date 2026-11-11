@@ -78,7 +78,9 @@ uv run --locked python scripts/validate_vision_precision.py --output artifacts/n
 
 ## 公开页面
 
-页头的 **EXAMPLES / REPRODUCIBLE** 收录 10 个新增结构概念与原有 2 个参数化 CAD 示例。新增范围包括航空发动机、飞机、邮轮、Model Y、iPhone、Optimus、猎鹰火箭、机械手表、炼油厂与工业机械臂，详见 [示例来源与复现](docs/showcase-examples.md)。品牌型号为外形参考，内部、比例及部件关系为人工示意，非照片重建或官方 CAD。
+页头的 **EXAMPLES / REPRODUCIBLE** 收录 10 个细化装配参考与原有 2 个参数化 CAD 示例。10 例共 **1,580 个命名部件**，按“总成—子总成—零件”三级组织，可搜索、整组选取、单独查看子总成、透视外壳及下载零件清单。发动机叶片、机翼翼肋、车轮制动与悬架、逐指指节、机芯轮系、塔器内件等分别建模，详见 [示例来源与复现](docs/showcase-examples.md)。
+
+部件类别参考 Apple / Tesla 维修手册、SpaceX 用户指南、FAA / NASA 与设备厂商技术资料；形状和比例仍为独立编写的工程近似，**不是完整官方 CAD、工厂 BOM 或照片重建**。Optimus 未公开的内部构型明确标为推定，电池包与密封相机不虚构到电芯/内部镜片。页面和 `references.json` 保留每例采用的资料与覆盖边界。
 
 GitHub Pages 展示可交互、可下载的公开示例。生成新图片、保存合并或名称需要运行本机服务，并在页面点击“连接生成服务”。浏览器可能要求允许访问本机网络。
 
