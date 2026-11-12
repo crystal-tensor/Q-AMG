@@ -153,6 +153,7 @@ class DemoPart:
     role: str = "component"
     basis: str = "reference_component_class"
     material: str = "工程示意材料"
+    evidence: dict | None = None
 
 
 class Model:
@@ -248,10 +249,13 @@ def generate_showcase(slug: str, output: Path) -> dict:
                        "role": item.role, "material": item.material,
                        "component_basis": profile.get("internal_basis", item.basis),
                        "source_refs": profile["sources"], "geometry_accuracy": "parametric_approximation",
-                       "is_cover": any(word in item.label for word in ["外壳", "蒙皮", "筒体", "整流罩", "护壳", "前罩", "后壳", "后盖", "底盖", "表盘", "显示屏", "玻璃车顶", "风挡", "船壳", "甲板板", "端盖", "机匣", "表镜"]),
+                       "is_cover": item.role == "cover" or any(word in item.label for word in ["外壳", "蒙皮", "筒体", "整流罩", "护壳", "前罩", "后壳", "后盖", "底盖", "表盘", "显示屏", "玻璃车顶", "风挡", "船壳", "甲板板", "端盖", "机匣", "表镜"]),
                        "explode_levels_mm": [(np.asarray(model.groups[top])*scaling).tolist(),
                                              (np.asarray(model.groups[item.group])*scaling).tolist(),
                                              record["explode_mm"]]})
+        if item.evidence:
+            record["hardware_evidence"] = item.evidence
+            record["source_refs"] = item.evidence["source_refs"]
     references = reference_bundle(slug)
     if slug == "model-y":
         source = Path(__file__).resolve().parents[2]/"assets/references/model-y"
@@ -268,6 +272,10 @@ def generate_showcase(slug: str, output: Path) -> dict:
     structure["decomposition"] = {"revision": 2, "levels": ["总成", "子总成", "零件"],
                                    "counts": counts, "complete_factory_bom": False}
     structure["references"] = references
+    if profile.get("hardware_truth_required"):
+        from .hardware_evidence import assess_hardware_evidence
+
+        structure["hardware_claim"] = assess_hardware_evidence(structure)
     structure["engineering_scope"] = profile["coverage"]+profile["inferred"]
     dump(output/"structure.json", structure)
     write_component_manifest(output, structure, references)
@@ -281,6 +289,7 @@ def generate_showcase(slug: str, output: Path) -> dict:
                    "reference_scope": "公开技术资料支持部件类别；形状、数量和装配位置仍以各例边界为准",
                    "references": references, "decomposition": structure["decomposition"],
                    "photo": references.get("photo"),
+                   "default_xray": profile.get("default_xray", False),
                    "limitations": [profile["inferred"], "未提供完整官方 CAD / 工厂 BOM", "碰撞采样不认证连续拆解路径"]}
     dump(output/"demo.json", description)
     summary = {"status": "generated", "kind": "procedural_demo", "spec": context.model_dump(),
@@ -289,6 +298,7 @@ def generate_showcase(slug: str, output: Path) -> dict:
                "decisions": problem.describe(candidate.bits), "resources": plan.resources,
                "provenance": provenance, "validation": validation, "demo": description,
                "decomposition": structure["decomposition"],
+               "hardware_claim": structure.get("hardware_claim"),
                "timings": {"end_to_end_s": time.perf_counter()-started},
                "disassembly": {"complete_for_generated_mesh": sequence["complete_for_generated_mesh"],
                                "moves": len(sequence["moves"]), "continuous_collision_proof": False}}

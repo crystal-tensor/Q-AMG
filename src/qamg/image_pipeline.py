@@ -365,7 +365,7 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
     if "decomposition" in structure:
         for record, original in zip(edited["parts"][:-1], kept, strict=True):
             for key in ["parent", "assembly_path", "role", "material", "component_basis", "source_refs",
-                        "geometry_accuracy", "is_cover", "explode_mm", "explode_levels_mm"]:
+                        "geometry_accuracy", "is_cover", "explode_mm", "explode_levels_mm", "hardware_evidence"]:
                 if key in original:
                     record[key] = original[key]
         edited["groups"] = [g for g in structure["groups"] if g["id"] != "edited-components"]
@@ -400,6 +400,8 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
                           "end_to_end_s": summary["timings"]["end_to_end_s"]+edit_s}}
     if "decomposition" in edited:
         result["decomposition"] = edited["decomposition"]
+    if "hardware_claim" in edited:
+        result["hardware_claim"] = edited["hardware_claim"]
     dump(output/"merge.json", {"source_run_id": source_run_id, "selected_ids": selected_ids,
                                "validation": validation, "edit_s": edit_s,
                                "quantum_resampling_performed": False})

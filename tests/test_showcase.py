@@ -11,9 +11,12 @@ from qamg.image_pipeline import load_run_parts, merge_run, rename_run
 from qamg.showcase import generate_showcase
 
 
-def test_catalogue_has_ten_new_distinct_cases_and_keeps_both_cad_cases():
-    assert len(CATALOGUE) == 10
+def test_catalogue_has_eleven_reference_cases_and_quantum_computer_first():
+    assert len(CATALOGUE) == 11
     assert len({e["slug"] for e in public_catalogue()}) == 12
+    assert public_catalogue()[0]["slug"] == "superconducting-computer"
+    assert public_catalogue()[0]["title"] == "相干一号：费曼"
+    assert "clamp" not in {e["slug"] for e in public_catalogue()}
     assert {"model-y", "iphone", "optimus", "falcon", "mechanical-watch", "refinery"} <= {e["slug"] for e in CATALOGUE}
 
 

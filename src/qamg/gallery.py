@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 CATALOGUE = [
+    {"slug": "superconducting-computer", "title": "相干一号：费曼", "category": "超导量子计算机", "description": "Google / IBM 公开架构参考 · 低温、射频、读出与封装", "reference": "https://www.ibm.com/quantum/hardware"},
     {"slug": "aero-engine", "title": "航空发动机", "category": "航空动力", "description": "逐片叶片、转静子、双轴、火焰筒与附件", "reference": "https://www.grc.nasa.gov/www/k-12/airplane/turbfan.html"},
     {"slug": "airliner", "title": "飞机", "category": "航空运输", "description": "蒙皮、隔框、翼梁翼肋、操纵面与轮端", "reference": "https://www.faa.gov/documentlibrary/media/advisory_circular/ac_65-15a.pdf"},
     {"slug": "luxury-liner", "title": "豪华轮船", "category": "船舶工程", "description": "肋骨舱壁、发电机组、电力推进与救生装置", "reference": "https://www.wartsila.com/encyclopedia/term/diesel-electric-propulsion"},
@@ -16,7 +17,6 @@ CATALOGUE = [
 
 LEGACY_CAD = [
     {"slug": "drive", "title": "轴 / 轴承 / 齿轮", "category": "参数化 CAD", "description": "传动装配 · 可下载 STEP"},
-    {"slug": "clamp", "title": "夹持机构", "category": "参数化 CAD", "description": "夹爪与导向 · 可下载 STEP"},
 ]
 
 

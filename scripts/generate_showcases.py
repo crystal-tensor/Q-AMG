@@ -1,4 +1,4 @@
-"""Build the ten explicitly authored examples with real QB layout receipts."""
+"""Build curated authored examples with native QB layout measurement records."""
 from __future__ import annotations
 
 import argparse

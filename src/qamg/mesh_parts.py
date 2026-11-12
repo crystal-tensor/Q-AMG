@@ -160,12 +160,11 @@ def sampled_disassembly(parts: list[mf.Manifold], ids: list[str], samples: int =
                     delta = np.zeros(3)
                     delta[axis] = sign*diagonal*1.4
                     clear = True
+                    others = np.asarray(sorted(remaining-{index}), dtype=int)
                     for fraction in np.linspace(1/samples, 1., samples):
                         shifted_bounds = bounds[index]+delta*fraction
-                        for other in remaining-{index}:
-                            overlap = np.minimum(shifted_bounds[1], bounds[other, 1])-np.maximum(shifted_bounds[0], bounds[other, 0])
-                            if np.any(overlap <= 1e-7):
-                                continue
+                        overlap = np.minimum(shifted_bounds[1], bounds[others, 1])-np.maximum(shifted_bounds[0], bounds[others, 0])
+                        for other in others[np.all(overlap > 1e-7, axis=1)]:
                             checks += 1
                             if (parts[index].translate(delta*fraction) ^ parts[other]).volume() > tolerance:
                                 clear = False

@@ -1139,3 +1139,8 @@ BUILDERS = {
     "model-y": model_y, "iphone": iphone, "optimus": optimus, "falcon": falcon,
     "mechanical-watch": mechanical_watch, "refinery": refinery, "industrial-arm": industrial_arm,
 }
+
+# Loaded after the shared primitives above; no alternate quantum SDK is used.
+from .superconducting import superconducting_computer
+
+BUILDERS["superconducting-computer"] = superconducting_computer

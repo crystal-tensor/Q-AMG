@@ -78,7 +78,7 @@ uv run --locked python scripts/validate_vision_precision.py --output artifacts/n
 
 ## 公开页面
 
-页头的 **EXAMPLES / REPRODUCIBLE** 收录 10 个细化装配参考与原有 2 个参数化 CAD 示例。10 例共 **1,580 个命名部件**，按“总成—子总成—零件”三级组织，可搜索、整组选取、单独查看子总成、透视外壳及下载零件清单。发动机叶片、机翼翼肋、车轮制动与悬架、逐指指节、机芯轮系、塔器内件等分别建模，详见 [示例来源与复现](docs/showcase-examples.md)。
+页头的 **EXAMPLES / REPRODUCIBLE** 收录 11 个细化装配参考与 1 个传动参数化 CAD 示例。11 例共 **2,520 个命名部件**，按“总成—子总成—零件”三级组织，可搜索、整组选取、单独查看子总成、透视外壳及下载零件清单。首例为 **“相干一号：费曼”超导量子计算机**：940 件参考建模，参照 Google / IBM 公开架构与低温工程论文，**尚未完成 500 件实物真实性核验**，详见 [逐件证据与范围](docs/superconducting-reference.md)。原夹持 CAD 的历史文件保留。发动机叶片、机翼翼肋、车轮制动与悬架、逐指指节、机芯轮系、塔器内件等分别建模，详见 [示例来源与复现](docs/showcase-examples.md)。
 
 部件类别参考 Apple / Tesla 维修手册、SpaceX 用户指南、FAA / NASA 与设备厂商技术资料；形状和比例仍为独立编写的工程近似，**不是完整官方 CAD、工厂 BOM 或照片重建**。Optimus 未公开的内部构型明确标为推定，电池包与密封相机不虚构到电芯/内部镜片。页面和 `references.json` 保留每例采用的资料与覆盖边界。
 

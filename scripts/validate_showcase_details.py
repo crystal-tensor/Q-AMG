@@ -46,8 +46,17 @@ def audit(root, public):
                    for batch in witnesses)
         assert run["provenance"]["quantum_sdk"] == "QuantumBridge"
         assert not run["provenance"]["quantum_speedup_verified"]
+        hardware = structure.get("hardware_claim")
+        if hardware:
+            assert hardware == run["hardware_claim"] == inventory["hardware_claim"]
+            assert hardware == read(directory/"hardware-evidence.json")
+            assert count >= 500 and hardware["modeled_part_instances"] == count
+            assert hardware["source_linked_reference_instances"] == count
+            assert hardware["verified_real_part_instances"] == 0
+            assert hardware["fully_real_500_requirement_met"] is False
+            assert sha(directory/"hardware-evidence.json") == sha(public/f"example-{slug}"/"hardware-evidence.json")
         with ZipFile(directory/"parts.zip") as archive:
-            assert len(archive.namelist()) == count+4 == len(set(archive.namelist()))
+            assert len(archive.namelist()) == count+4+bool(hardware) == len(set(archive.namelist()))
             assert json.loads(archive.read("bom.json")) == inventory
             assert json.loads(archive.read("structure.json")) == structure
             for part, component in zip(structure["parts"], inventory["components"], strict=True):

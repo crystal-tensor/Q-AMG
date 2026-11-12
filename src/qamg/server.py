@@ -244,7 +244,7 @@ def create_app(output: Path | str = "artifacts/runs", web_root: Path | None = No
                    "trace.json", "design.json", "problem.json", "disassembly.json", "merge.json", "annotation.json",
                    "input.png", "processed.png", "source.glb", "assembly.obj", "assembly.stl", "parts.zip", "quality-review.json",
                    "container-fit.json", "foreground-mask.png", "lid-mask.png", "sleeve-mask.png",
-                   "demo.json", "thumbnail.png", "bom.json", "bom.csv", "references.json",
+                   "demo.json", "thumbnail.png", "bom.json", "bom.csv", "references.json", "hardware-evidence.json",
                    "reference-photo.png", "photo-attribution.json"}
         if filename not in allowed:
             raise HTTPException(404, "Unknown artifact")

@@ -40,12 +40,13 @@ def main():
         output.mkdir(exist_ok=True)
         for file in ["run.json", "structure.json", "trace.json", "assembly.glb", "assembly.step", "assembly.obj",
                      "parts.zip", "input.png", "disassembly.json", "quality-review.json", "demo.json", "thumbnail.png",
-                     "bom.json", "bom.csv", "references.json", "reference-photo.png", "photo-attribution.json"]:
+                     "bom.json", "bom.csv", "references.json", "reference-photo.png", "photo-attribution.json", "hardware-evidence.json"]:
             if (source/file).is_file():
                 shutil.copy2(source/file, output/file)
         examples.append({"id": id, "title": entry["title"], "category": entry["category"],
                          "description": entry["description"], "kind": summary.get("kind", "parametric_cad"),
                          "part_count": summary["part_count"], "decomposition": summary.get("decomposition"),
+                         "hardware_claim": summary.get("hardware_claim"),
                          "photo": summary.get("demo", {}).get("photo"),
                          "thumbnail": "thumbnail.png" if (output/"thumbnail.png").is_file() else None})
     (target/"index.json").write_text(json.dumps({"project": "Q-AMG", "quantum_sdk": "QuantumBridge",
