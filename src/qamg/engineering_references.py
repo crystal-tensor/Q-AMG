@@ -99,7 +99,7 @@ PROFILES = {
         "reviewed_on": "2026-11-12",
     },
     "superconducting-computer": {
-        "variant": "相干一号：费曼 · 双参考图约束重建",
+        "variant": "相干一号：Feynman · 双参考图约束重建",
         "sources": ["google-superconducting-hardware", "ibm-cryostat", "google-microwave-engineering", "krinner-cryogenic-2019"],
         "coverage": "图1约束铝型材大机架、分节银色桶、法兰与黑色提手；去掉桌子、电脑、梯子和房间杂物。图2约束金色冷盘、支柱、编织热连接、盘绕同轴和底部扇出。可切换整机外观、移开外桶、内部布线。",
         "inferred": "这是按两张参考照片约束的人工参数化重建，非神经模型自动识别成功。图2只作内部结构参考，未确认与图1为同一设备；隐藏结构、48路布线取样、尺寸及连接关系均有推定。照片没有实测标尺，也不证明500件真实实机BOM。原图仅保留在本机，不加入公开仓库。",

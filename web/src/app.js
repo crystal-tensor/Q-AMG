@@ -49,7 +49,7 @@ function clearRun(message='正在生成当前输入的模型…'){
   $('source-reference').hidden=true;$('source-tag').textContent='等待本次结果';$('trace-note').textContent='本次生成完成后显示测量记录。';
   $('demo-reference').hidden=true;
   accessView='exterior';$('access-controls').hidden=true;$('xray-parts').hidden=false;
-  $('hardware-verification').hidden=true;$('download-hardware-evidence').hidden=true;$('part-count-label').textContent='独立零件';
+  $('download-hardware-evidence').hidden=true;$('part-count-label').textContent='独立零件';
   $('decisions').replaceChildren();$('trace-panel').replaceChildren();$('trace-panel').hidden=true;
   $('disassemble').disabled=true;$('restore-parts').disabled=true;
   $('container-fit-panel').hidden=true;
@@ -159,8 +159,8 @@ async function loadRun(id){
   $('model-title').textContent=showcase?`${summary.title} · ${data.decomposition?'部件装配参考':'结构示意'}`:imageDerived?`${id.startsWith('example-')?'示例 · ':''}${summary.source_name||'图像生成结果'}`:family==='drive'?'轴、轴承与齿轮的结构协作。':'让夹持与导向各得其位。';$('representation-label').textContent=data.access_views?'3D / PHOTO-GUIDED RECONSTRUCTION':showcase?'3D / REFERENCE COMPONENT ASSEMBLY':meshOnly?'3D / GENERATED MESH PARTS':'CAD / PARAMETRIC B-REP';
   $('part-count').textContent=summary.part_count;$('qubits').textContent=summary.resources.peak_logical_qubits??summary.resources.logical_qubits??'经典';$('shots').textContent=(summary.resources.total_shots??summary.resources.shots)?.toLocaleString()??'—';$('duration').textContent=summary.timings.end_to_end_s.toFixed(2)+' s';
   $('validation-tag').textContent=summary.validation.valid?(showcase?'● 示意实体有效':meshOnly?'● 网格有效 · 结构待核验':'● 几何校验通过'):'校验未通过';$('validation-tag').classList.toggle('valid',summary.validation.valid);$('selected-bits').textContent=summary.selected_bits;
-  const hardware=data.hardware_claim;$('hardware-verification').hidden=!hardware;
-  if(hardware){$('part-count-label').textContent='参考建模件数';$('validation-tag').textContent=summary.validation.valid?'● 网格校验通过 · 实机待核':'校验未通过';$('validation-tag').classList.remove('valid');$('hardware-modeled').textContent=hardware.modeled_part_instances.toLocaleString();$('hardware-verified').textContent=`${hardware.verified_real_part_instances} / ${hardware.target_verified_real_parts}`;$('hardware-scope').textContent=`${data.references?.photo_guided?'按你提供的两张图约束重建；外观依据图1，内部金色布线参照图2，未确认两图属于同一设备。':'Google / IBM 公开架构参考；'}“相干一号：费曼”为本示例展示名称。尺寸、布线数量和隐藏连接含推定，500 件实物真实性尚未核验。`;const link=$('download-hardware-evidence');link.hidden=false;link.href=base+'hardware-evidence.json';link.setAttribute('aria-disabled','false');link.download='hardware-evidence.json';}
+  const hardware=data.hardware_claim;
+  if(hardware){$('part-count-label').textContent='参考建模件数';$('validation-tag').textContent=summary.validation.valid?'● 网格校验通过 · 实机待核':'校验未通过';$('validation-tag').classList.remove('valid');const link=$('download-hardware-evidence');link.hidden=false;link.href=base+'hardware-evidence.json';link.setAttribute('aria-disabled','false');link.download='hardware-evidence.json';}
   const source=summary.provenance.execution_source;$('source-tag').textContent=source==='classical_cpu'?'经典对照':source.includes('simulator')?'QB 模拟测量':'远端后端';
   const device=trace.flatMap(r=>r.plan?.trace||[]).findLast(b=>b.metadata?.device)?.metadata.device,label=device==='mps'?'Apple GPU / MPS':device==='cuda'?'CUDA GPU':device||'CPU';if(apiAvailable)$('runtime').textContent=`QB · ${source==='classical_cpu'?'经典 CPU':label}`;
   const compact=summary.resources.encoding==='compact_binary',physical=compact?summary.selected_bits.match(/../g).map(p=>p[1]).join(''):summary.selected_bits;

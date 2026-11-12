@@ -15,7 +15,7 @@ def test_catalogue_has_eleven_reference_cases_and_quantum_computer_first():
     assert len(CATALOGUE) == 11
     assert len({e["slug"] for e in public_catalogue()}) == 12
     assert public_catalogue()[0]["slug"] == "superconducting-computer"
-    assert public_catalogue()[0]["title"] == "相干一号：费曼"
+    assert public_catalogue()[0]["title"] == "相干一号：Feynman"
     assert "clamp" not in {e["slug"] for e in public_catalogue()}
     assert {"model-y", "iphone", "optimus", "falcon", "mechanical-watch", "refinery"} <= {e["slug"] for e in CATALOGUE}
 
