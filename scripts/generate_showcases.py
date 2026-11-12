@@ -23,12 +23,12 @@ def main():
         records.append({"id": entry["slug"], "part_count": summary["part_count"],
                         "valid": summary["validation"]["valid"], "quantum_sdk": "QuantumBridge",
                         "measured_bits": summary["selected_bits"], "seconds": summary["timings"]["end_to_end_s"],
-                        "photo_reconstruction_performed": False, "official_product_cad": False})
+                        "photo_reconstruction_performed": summary["provenance"]["photo_reconstruction_performed"], "official_product_cad": False})
         print(f"  {summary['part_count']} parts, valid={summary['validation']['valid']}, "
               f"{summary['timings']['end_to_end_s']:.2f}s", flush=True)
     receipt = f"showcases-{args.only}-manifest.json" if args.only else "showcases-manifest.json"
     dump(args.output/receipt, {"examples": records, "hardware_verified": False,
-            "quantum_speedup_verified": False, "scope": "Authored structural concepts, not photo or OEM reconstructions"})
+            "quantum_speedup_verified": False, "scope": "Authored reference assemblies; photo-guided cases explicitly marked, not OEM CAD or verified physical parts"})
 
 
 if __name__ == "__main__":

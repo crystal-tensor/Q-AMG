@@ -35,7 +35,7 @@ def assess_hardware_evidence(structure: dict, minimum: int = 500) -> dict:
         "fully_real_500_requirement_met": False,
         "component_types": dict(types), "missing_evidence_counts": dict(gaps),
         "brand_scope": "相干一号：费曼为用户指定展示名称；非 Google / IBM 产品名称",
-        "scope": "公开架构与器件类别参考；网格数量、引用或软件布尔检查均不证明500件实物完全真实",
+        "scope": "照片与器件类别参考；网格数量、引用或软件布尔检查均不证明500件实物完全真实" if structure.get("references", {}).get("photo_guided") else "公开架构与器件类别参考；网格数量、引用或软件布尔检查均不证明500件实物完全真实",
         "required_to_verify": ["同一台设备的原厂或经授权 BOM 及版本", "逐件料号与数量对应", "有尺寸的 CAD 或实测记录",
                                "零件在整机中的装配坐标与连接关系", "与这些文件绑定的实机逐件核对记录"],
     }

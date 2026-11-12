@@ -27,6 +27,7 @@ def write_component_manifest(directory, structure, references):
                         "component_type": evidence.get("component_type", "edited_composite"),
                         "reference_part_number": evidence.get("reference_part_number") or "未公开/待核",
                         "source_locator": evidence.get("source_locator", "用户几何编辑"),
+                        "reference_image_id": evidence.get("reference_image_id", "无"),
                         "quantity_basis": evidence.get("quantity_basis", "geometry_edit"),
                         "dimensions_basis": evidence.get("dimensions_basis", "geometry_edit"),
                         "position_basis": evidence.get("position_basis", "geometry_edit"),

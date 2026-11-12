@@ -84,6 +84,23 @@ def test_catalogued_demo_is_served_by_local_backend(phone, monkeypatch, tmp_path
         assert client.post("/api/runs/example-iphone/container-fit").status_code == 422
 
 
+def test_saved_merge_keeps_shell_view_and_removal_pose(phone, tmp_path):
+    directory, _ = phone
+    path = directory/"structure.json"
+    structure = json.loads(path.read_text())
+    structure["access_views"] = {"default": "open", "views": [
+        {"id": "open", "label": "移开外桶", "scopes": ["outer_shell", "interior"], "reveal": True}]}
+    for part in structure["parts"][:2]:
+        part.update(view_scope="outer_shell", reveal_translation_mm=[59, 25, -8])
+    path.write_text(json.dumps(structure))
+    output = tmp_path/"shell-edit"
+    merge_run(directory, ["part-000", "part-001"], output, "example-iphone")
+    edited = json.loads((output/"structure.json").read_text())
+    assert edited["access_views"] == structure["access_views"]
+    assert edited["parts"][-1]["view_scope"] == "outer_shell"
+    assert edited["parts"][-1]["reveal_translation_mm"] == [59, 25, -8]
+
+
 @pytest.mark.parametrize(("slug", "required"), [
     ("aero-engine", ["风扇叶片 01", "第 1 级静子导叶 01", "低压内轴", "高压空心外轴", "外火焰筒"]),
     ("airliner", ["机身环形隔框 01", "左翼前翼梁", "右翼肋 01", "方向舵"]),

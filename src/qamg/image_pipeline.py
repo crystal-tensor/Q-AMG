@@ -68,6 +68,15 @@ def export_parts(parts, output: Path, provenance: dict, disassembly: dict, valid
                 baseColorFactor=appearance[i]["rgba"], alphaMode="BLEND", doubleSided=True,
                 metallicFactor=0., roughnessFactor=.15)
             meters.visual = trimesh.visual.TextureVisuals(material=material)
+        elif appearance and appearance[i].get("type") == "pbr_surface":
+            surface = appearance[i]
+            rgba = np.asarray(surface["rgba"], dtype=float)/255
+            rgb = rgba[:3]
+            linear = np.where(rgb <= .04045, rgb/12.92, ((rgb+.055)/1.055)**2.4)
+            material = trimesh.visual.material.PBRMaterial(
+                baseColorFactor=np.r_[linear, rgba[3]], alphaMode="OPAQUE", doubleSided=False,
+                metallicFactor=surface["metallic"], roughnessFactor=surface["roughness"])
+            meters.visual = trimesh.visual.TextureVisuals(material=material)
         scene.add_geometry(meters, geom_name=id, node_name=id)
     scene.export(output/"assembly.glb")
     combined = as_trimesh(merge_solids(parts))
@@ -365,7 +374,7 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
     if "decomposition" in structure:
         for record, original in zip(edited["parts"][:-1], kept, strict=True):
             for key in ["parent", "assembly_path", "role", "material", "component_basis", "source_refs",
-                        "geometry_accuracy", "is_cover", "explode_mm", "explode_levels_mm", "hardware_evidence"]:
+                        "geometry_accuracy", "is_cover", "explode_mm", "explode_levels_mm", "hardware_evidence", "view_scope", "reveal_translation_mm"]:
                 if key in original:
                     record[key] = original[key]
         edited["groups"] = [g for g in structure["groups"] if g["id"] != "edited-components"]
@@ -374,6 +383,13 @@ def merge_run(source_directory: Path, selected_ids: list[str], output: Path,
                                     "role": "user_merged_components", "component_basis": "geometry_edit"})
         for key in ["references", "engineering_scope", "decomposition"]:
             edited[key] = structure[key]
+        if "access_views" in structure:
+            edited["access_views"] = structure["access_views"]
+            originals = [p for p in structure["parts"] if p["id"] in selected_ids]
+            scopes = {p.get("view_scope", "interior") for p in originals}
+            edited["parts"][-1]["view_scope"] = scopes.pop() if len(scopes) == 1 else "interior"
+            edited["parts"][-1]["reveal_translation_mm"] = np.mean(
+                [p.get("reveal_translation_mm", [0, 0, 0]) for p in originals], axis=0).tolist()
         active = {p["parent"] for p in edited["parts"]}
         for group in reversed(edited["groups"]):
             if group["id"] in active:

@@ -218,7 +218,8 @@ def generate_showcase(slug: str, output: Path) -> dict:
     anchor = int(np.argmax([p.volume() for p in parts]))
     sequence = selected_disassembly(parts, ids, vectors, anchor, samples=12)
     validation = validate_partition(merge_solids(parts), parts)
-    validation["checks"].update({"authored_conceptual_example": True, "photo_reconstruction_performed": False,
+    validation["checks"].update({"authored_conceptual_example": True, "photo_reconstruction_performed": bool(profile.get("photo_guided")),
+                                  "neural_reconstruction_performed": False,
                                   "official_product_cad": False, "manufacturing_joints_verified": False})
     validation["assembly_overlap_fraction"] = max(0., sum(p.volume() for p in parts)/validation["merged_volume_mm3"]-1)
     provenance = {"mode": "qb", "execution_source": plan.execution_source, "quantum_sdk": "QuantumBridge",
@@ -231,6 +232,13 @@ def generate_showcase(slug: str, output: Path) -> dict:
                   "selected_measurement": {"bits": candidate.bits, "job_id": candidate.first_job_id,
                                            "observed_count": candidate.count, "count_scope": "all_batches_in_this_plan",
                                            "kind": "direct_or_exactly_decoded"}}
+    if profile.get("photo_guided"):
+        provenance.update({"geometry_source": "photo_constrained_authored_reconstruction",
+                           "geometry_is_inferred": True, "photo_reconstruction_method": "explicit_photo_guided_parametric_model",
+                           "neural_reconstruction_performed": False, "photo_reconstruction_performed": True,
+                           "reference_images": profile["reference_images"], "same_device_cross_view_verified": False,
+                           "fallback_scope": "quantum_layout_sampling_only",
+                           "separate_neural_baseline": profile["neural_baseline"]})
     output.mkdir(parents=True, exist_ok=True)
     structure = export_parts(parts, output, provenance, sequence, validation, [p.label for p in model.parts],
                               explosion_vectors=vectors, appearance=[p.appearance or {} for p in model.parts])
@@ -256,6 +264,9 @@ def generate_showcase(slug: str, output: Path) -> dict:
         if item.evidence:
             record["hardware_evidence"] = item.evidence
             record["source_refs"] = item.evidence["source_refs"]
+            if "view_scope" in item.evidence:
+                record["view_scope"] = item.evidence["view_scope"]
+                record["reveal_translation_mm"] = item.evidence["reveal_translation_mm"]
     references = reference_bundle(slug)
     if slug == "model-y":
         source = Path(__file__).resolve().parents[2]/"assets/references/model-y"
@@ -272,6 +283,8 @@ def generate_showcase(slug: str, output: Path) -> dict:
     structure["decomposition"] = {"revision": 2, "levels": ["总成", "子总成", "零件"],
                                    "counts": counts, "complete_factory_bom": False}
     structure["references"] = references
+    if profile.get("access_views"):
+        structure["access_views"] = profile["access_views"]
     if profile.get("hardware_truth_required"):
         from .hardware_evidence import assess_hardware_evidence
 
@@ -286,10 +299,11 @@ def generate_showcase(slug: str, output: Path) -> dict:
     description = {**entry, "kind": "procedural_demo", "detail_revision": 2,
                    "geometry_source": "Q-AMG independently authored reference component geometry",
                    "variant": profile["variant"], "coverage": profile["coverage"],
-                   "reference_scope": "公开技术资料支持部件类别；形状、数量和装配位置仍以各例边界为准",
+                   "reference_scope": "用户照片约束可见外观；不可见连接与尺寸仍有推定" if profile.get("photo_guided") else "公开技术资料支持部件类别；形状、数量和装配位置仍以各例边界为准",
                    "references": references, "decomposition": structure["decomposition"],
                    "photo": references.get("photo"),
                    "default_xray": profile.get("default_xray", False),
+                   "photo_guided": profile.get("photo_guided", False),
                    "limitations": [profile["inferred"], "未提供完整官方 CAD / 工厂 BOM", "碰撞采样不认证连续拆解路径"]}
     dump(output/"demo.json", description)
     summary = {"status": "generated", "kind": "procedural_demo", "spec": context.model_dump(),

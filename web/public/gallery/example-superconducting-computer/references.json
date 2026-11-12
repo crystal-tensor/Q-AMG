@@ -1,5 +1,5 @@
 {
-  "variant": "相干一号：费曼 · Google / IBM 架构参考设计",
+  "variant": "相干一号：费曼 · 双参考图约束重建",
   "sources": [
     {
       "id": "google-superconducting-hardware",
@@ -26,12 +26,80 @@
       "supports": "§2–3 / Fig.3–6 的冷级、射频链路、铜夹块/楔块/M3 螺钉、衰减器、滤波器与放大器；非 Google/IBM 整机 BOM 或尺寸图"
     }
   ],
-  "coverage": "覆盖五级冷盘、真空与热屏、脉冲管/稀释回路、65 路参考射频线缆及热锚、衰减/滤波/放大链、QPU 封装和室温测控。",
-  "inferred": "名称由用户指定，非 Google / IBM 产品。65 路取自 Krinner Fig.3 的 25 驱动、25 磁通、6 读入、5 泵浦、4 输出配置；与文中另一测量语境的 66 路不混用。夹块数量、走线、机械尺寸与位置为独立参考设计，非两家公司实机复刻。1:10 为展示比例，原型外形尺寸也未实测；密封模块不虚构内部零件，芯片图案不计件。未取得同一台设备 BOM/CAD/实机核对记录，500 件完全真实的要求尚未核实。",
+  "coverage": "图1约束铝型材大机架、分节银色桶、法兰与黑色提手；去掉桌子、电脑、梯子和房间杂物。图2约束金色冷盘、支柱、编织热连接、盘绕同轴和底部扇出。可切换整机外观、移开外桶、内部布线。",
+  "inferred": "这是按两张参考照片约束的人工参数化重建，非神经模型自动识别成功。图2只作内部结构参考，未确认与图1为同一设备；隐藏结构、48路布线取样、尺寸及连接关系均有推定。照片没有实测标尺，也不证明500件真实实机BOM。原图仅保留在本机，不加入公开仓库。",
   "display_scale_denominator": 10,
-  "default_xray": true,
+  "default_xray": false,
   "hardware_truth_required": true,
+  "photo_guided": true,
+  "neural_baseline": {
+    "model": "pinned PartCrafter + SAM2.1",
+    "accepted": false,
+    "status": "failed_no_usable_surface",
+    "error": "部件1没有形成可用表面",
+    "published_as_neural_success": false
+  },
   "reviewed_on": "2026-11-12",
+  "reference_images": [
+    {
+      "id": "user-exterior-20261112",
+      "label": "用户图1 · 银色桶体与铝型材机架",
+      "sha256": "48dbcf7dad3ea3cfd5c479f9e6334a0be2dd21fea7bcff8ec0db0e0e95766805",
+      "width": 2310,
+      "height": 1946,
+      "role": "exterior_proportions",
+      "redistributed": false
+    },
+    {
+      "id": "user-interior-20261112",
+      "label": "用户图2 · 金色冷盘与密集布线",
+      "sha256": "24ef97ccdd7587dab41ace14ce8af7a3dd6ab63280fd91bf273d3976e336ca06",
+      "width": 1366,
+      "height": 1935,
+      "role": "interior_visual_reference_not_confirmed_same_machine",
+      "redistributed": false
+    }
+  ],
+  "access_views": {
+    "default": "open",
+    "thumbnail": "wiring",
+    "camera_direction": [
+      0.7,
+      2.5,
+      0.55
+    ],
+    "views": [
+      {
+        "id": "exterior",
+        "label": "整机外观",
+        "scopes": [
+          "frame",
+          "interior",
+          "outer_shell",
+          "thermal_shell"
+        ],
+        "reveal": false
+      },
+      {
+        "id": "open",
+        "label": "移开外桶",
+        "scopes": [
+          "interior",
+          "outer_shell",
+          "thermal_shell"
+        ],
+        "reveal": true
+      },
+      {
+        "id": "wiring",
+        "label": "内部布线",
+        "scopes": [
+          "interior"
+        ],
+        "reveal": true
+      }
+    ]
+  },
   "geometry_origin": "independently_authored_parametric_geometry",
   "oem_cad": false,
   "complete_factory_bom": false,

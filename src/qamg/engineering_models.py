@@ -1141,6 +1141,6 @@ BUILDERS = {
 }
 
 # Loaded after the shared primitives above; no alternate quantum SDK is used.
-from .superconducting import superconducting_computer
+from .superconducting_photo import superconducting_computer
 
 BUILDERS["superconducting-computer"] = superconducting_computer

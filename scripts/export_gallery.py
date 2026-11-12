@@ -47,6 +47,7 @@ def main():
                          "description": entry["description"], "kind": summary.get("kind", "parametric_cad"),
                          "part_count": summary["part_count"], "decomposition": summary.get("decomposition"),
                          "hardware_claim": summary.get("hardware_claim"),
+                         "photo_guided": summary.get("demo", {}).get("photo_guided", False),
                          "photo": summary.get("demo", {}).get("photo"),
                          "thumbnail": "thumbnail.png" if (output/"thumbnail.png").is_file() else None})
     (target/"index.json").write_text(json.dumps({"project": "Q-AMG", "quantum_sdk": "QuantumBridge",

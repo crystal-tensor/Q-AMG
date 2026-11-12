@@ -35,6 +35,7 @@ def audit(root, public):
         assert run["validation"]["valid"] and not references["oem_cad"]
         assert not references["complete_factory_bom"] and not references["dimensions_measured"]
         source_ids = {source["id"] for source in references["sources"]}
+        source_ids.update(source["id"] for source in references.get("reference_images", []))
         groups = {g["id"]: g for g in structure["groups"]}
         geometry = trimesh.load(directory/"assembly.glb", force="scene")
         assert len(geometry.graph.nodes_geometry) == count

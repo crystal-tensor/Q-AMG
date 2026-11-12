@@ -7,6 +7,7 @@ from qamg.component_manifest import write_component_manifest
 from qamg.engineering_references import reference_bundle
 from qamg.hardware_evidence import assess_hardware_evidence
 from qamg.superconducting import superconducting_computer
+from qamg.superconducting_photo import superconducting_computer as photo_computer
 
 
 def test_reference_links_and_self_declared_flags_cannot_certify_real_hardware():
@@ -29,7 +30,7 @@ def test_superconducting_reference_preserves_continuous_cables_and_physical_part
     model = superconducting_computer()
     assert len(model.parts) >= 500
     assert len({p.evidence["instance_id"] for p in model.parts}) == len(model.parts)
-    source_ids = {s["id"] for s in reference_bundle("superconducting-computer")["sources"]}
+    source_ids = {s["id"] for s in reference_bundle("superconducting-architecture-v1")["sources"]}
     for part in model.parts:
         assert part.solid.volume() > 0
         positive = [p for p in part.solid.decompose() if p.volume() > max(1e-8, part.solid.volume()*1e-6)]
@@ -45,6 +46,32 @@ def test_superconducting_reference_preserves_continuous_cables_and_physical_part
     # Two purchased four-channel arrays are two modules, not eight faux parts.
     assert kinds.count("isolator_array") == 2
     assert kinds.count("quantum_processor") == 1
+
+
+def test_photo_model_matches_exterior_and_exposes_gold_wiring_without_desks():
+    model = photo_computer()
+    assert len(model.parts) >= 500
+    assert len({p.evidence["instance_id"] for p in model.parts}) == len(model.parts)
+    refs = reference_bundle("superconducting-computer")
+    assert len(refs["reference_images"]) == 2
+    assert all(not image["redistributed"] for image in refs["reference_images"])
+    assert refs["access_views"]["default"] == "open"
+    image_ids = {image["id"] for image in refs["reference_images"]}
+    kinds = [p.evidence["component_type"] for p in model.parts]
+    assert kinds.count("vacuum_can_upper") == kinds.count("vacuum_can_lower") == 1
+    assert kinds.count("can_handle") == 4
+    assert kinds.count("copper_plate") == 5
+    assert kinds.count("rf_cable") == 96  # Two assemblies/line, not one cut at every cold stage.
+    assert kinds.count("fanout_coax") == 24
+    assert kinds.count("braided_thermal_link") == 2
+    for part in model.parts:
+        assert set(part.evidence["source_refs"]) <= image_ids
+        assert not any(word in part.label for word in ["桌子", "电脑", "显示器", "梯子"])
+        positive = [p for p in part.solid.decompose() if p.volume() > max(1e-8, part.solid.volume()*1e-6)]
+        assert len(positive) == 1, part.label
+        if part.evidence["view_scope"] in {"outer_shell", "thermal_shell"}:
+            assert part.evidence["reveal_translation_mm"][0] >= 50
+            assert part.appearance["rgba"][-1] == 255  # Physical displacement, not a translucent can.
 
 
 def test_exported_bom_and_zip_keep_unverified_hardware_scope_after_edits(tmp_path):
